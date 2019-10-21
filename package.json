@@ -1,0 +1,45 @@
+{
+  "name": "novel-reader",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "ts-node ./scripts/server.js",
+    "web-dev": "cross-env WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node ./scripts/server.ts",
+    "web-backend-server": "cross-env WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node ./src/web/server.ts",
+    "build:web-server": "tsc -p src/web/tsconfig.json --outDir dist/server",
+    "build:web-app": "parcel build src/app/pages/**/*.html -d dist/server/app --public-url=./ --no-source-maps",
+    "build:web": "npm run build:web-server && npm run build:web-app"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-http-proxy": "^1.6.0",
+    "js-base64": "^2.5.1",
+    "translation.js": "^0.7.12",
+    "ts-node": "^8.4.1",
+    "uikit": "^3.2.1",
+    "uuid": "^3.3.3",
+    "vue": "^2.6.10",
+    "vue-class-component": "^7.1.0",
+    "vue-property-decorator": "^8.3.0",
+    "vuex": "^3.1.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/body-parser": "^1.17.1",
+    "@types/express": "^4.17.1",
+    "@types/js-base64": "^2.3.1",
+    "@types/electron": "^1.6.10",
+    "@types/node": "^12.7.4",
+    "@types/uuid": "^3.4.5",
+    "@vue/component-compiler-utils": "^3.0.0",
+    "vue-hot-reload-api": "^2.3.4",
+    "cross-env": "^6.0.0",
+    "electron": "^6.0.12",
+    "less": "^3.10.3",
+    "parcel-bundler": "^1.12.3",
+    "typescript": "^3.6.2",
+    "vue-template-compiler": "^2.6.10"
+  }
+}

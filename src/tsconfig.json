@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "esModuleInterop": false,
+    "target": "es5",
+    "baseUrl": "."
+    },
+    "typeRoots": [
+      "./",
+      "../node_modules/@types"
+    ]
+}
