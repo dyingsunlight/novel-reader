@@ -28,6 +28,15 @@
       <button class="uk-button uk-button-default uk-button-large uk-width-1-4" @click="next()"> Next </button>
       <button class="uk-button uk-button-default uk-button-large uk-width-1-4" @click="playAudio(index)"> Audio </button>
     </div>
+
+    <div class="uk-margin-top">
+      <button class="uk-button uk-button-default" > {{ engine }}</button>
+      <div uk-dropdown="mode: click">
+        <ul class="uk-nav uk-dropdown-nav">
+          <li v-for="option in engines"> <a  @click="engine = option">{{ option }} </a></li>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -52,6 +61,13 @@
     translatedTextSegments: { [key: number]: string[] } = []
     textSegments: { [key: number]: string } = []
     segmentMarkers: { [key: number]: boolean } = []
+
+    engine = 'youdao'
+    engines = [
+      'youdao',
+      'google',
+      'baidu'
+    ]
 
     get currentTranslatedText() {
       const texts = this.translatedTextSegments[this.index]
@@ -100,7 +116,7 @@
 
           while (!isSucceed && retryTimes < 3) {
             try {
-              data = await PlatformService.translate(text)
+              data = await PlatformService.translate(text, this.engine)
               isSucceed = true
             } catch (e) {
               retryTimes++

@@ -4,9 +4,9 @@ export class WebService implements PlatformService {
   constructor() {
   }
   
-  async translate(text: string, toLang?: string): Promise<string> {
+  async translate(text: string, engine = 'youdao'): Promise<string> {
     const res = await request.post('/text/translation', {
-      engine: 'youdao',
+      engine,
       params: {
         text,
         to: 'zh-CN',
