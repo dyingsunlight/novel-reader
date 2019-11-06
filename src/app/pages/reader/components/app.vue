@@ -10,7 +10,7 @@
 
     <div class="uk-margin-medium-top">
       <div class="uk-flex uk-flex-column uk-flex-right uk-text-bold" style="min-height: 200px">
-        <span> {{ textSegments[index] }} </span>
+        <span> {{ untranslatedTexts[index] }} </span>
       </div>
       <hr>
       <div class="uk-flex uk-flex-column uk-flex-left" style="min-height: 200px">
@@ -47,7 +47,8 @@
   import {ExtendedPromiseAll} from "../../../core/utils"
   import PlatformService from '../../../services/platform'
 
-  const preTranslateRange = 5
+  const preloadRangeThreshold = 5
+  const preloadRange = 15
 
   @Component({
     components: {}
@@ -58,9 +59,9 @@
 
 
     index = 0
-    translatedTextSegments: { [key: number]: string[] } = []
-    textSegments: { [key: number]: string } = []
-    segmentMarkers: { [key: number]: boolean } = []
+    translatedTexts: { [key: number]: string } = {}
+    untranslatedTexts: { [key: number]: string } = {}
+    isTextTranslated: { [key: number]: boolean } = {}
 
     engine = 'youdao'
     engines = [
@@ -70,20 +71,18 @@
     ]
 
     get currentTranslatedText() {
-      const texts = this.translatedTextSegments[this.index]
-      if (!texts) return ''
-      return texts.join('\n')
+      return this.translatedTexts[this.index] || ''
     }
 
     @Watch('allTexts')
     onTextChanged() {
-      this.segmentMarkers = {}
-      this.textSegments = this.allTexts.split('\n').filter(Boolean).reduce((prev, item, index) => {
+      this.isTextTranslated = {}
+      this.untranslatedTexts = this.allTexts.split('\n').filter(Boolean).reduce((prev, item, index) => {
         prev[index] = item
         return prev
       }, {})
       this.index = 0
-      this.updateTranslations(0)
+      return this.updateTranslations(0)
     }
 
     prev() {
@@ -91,43 +90,40 @@
     }
 
     next() {
-      const keys = Object.keys(this.textSegments)
+      const keys = Object.keys(this.untranslatedTexts)
       this.index = Math.min(Math.max(keys.length - 1, 0), this.index + 1)
     }
 
     get size() {
-      return Object.keys(this.textSegments).length
+      return Object.keys(this.untranslatedTexts).length
     }
 
     async updateTranslations(forIndex: number) {
 
-      const keys = Object.keys(this.textSegments)
-      const downRange = Math.max(0, forIndex - preTranslateRange)
-      const upRange = Math.min(Math.max(keys.length, 0), forIndex + preTranslateRange)
+      const keys = Object.keys(this.untranslatedTexts)
+      const downRangeThreshold = Math.max(0, forIndex - preloadRangeThreshold)
+      const upRangeThreshold = Math.min(keys.length, forIndex + preloadRangeThreshold)
+
+
+      let isRequiredFurtherPreload = false
+      for (let i = downRangeThreshold; i < upRangeThreshold; i++) {
+        if (isRequiredFurtherPreload) continue
+        if (!this.isTextTranslated[i]) {
+          isRequiredFurtherPreload = true
+        }
+      }
+
+      const downRange = Math.max(0, downRangeThreshold - (isRequiredFurtherPreload ? preloadRange : 0))
+      const upRange = Math.min(keys.length, upRangeThreshold + (isRequiredFurtherPreload ? preloadRange : 0))
 
       const jobs = []
       for (let i = downRange; i < upRange; i++) {
-        if (this.segmentMarkers[i]) continue
-        const text = this.textSegments[i]
+        if (this.isTextTranslated[i]) continue
+        const text = this.untranslatedTexts[i]
         jobs.push(async () => {
-          let isSucceed = false
-          let retryTimes = 0
-          let data
-
-          while (!isSucceed && retryTimes < 3) {
-            try {
-              data = await PlatformService.translate(text, this.engine)
-              isSucceed = true
-            } catch (e) {
-              retryTimes++
-            }
-          }
-
-          if (!isSucceed || !data) return
-
-          console.log('data', data)
-          this.$set(this.translatedTextSegments, i, data.result)
-          this.segmentMarkers[i] = true
+          let data = await PlatformService.translate(text, this.engine)
+          this.$set(this.translatedTexts, i, data)
+          this.isTextTranslated[i] = true
         })
       }
       if (jobs.length) {
@@ -137,12 +133,12 @@
 
     @Watch('index')
     async onIndexChanged(newIndex) {
-      this.updateTranslations(newIndex)
+      return this.updateTranslations(newIndex)
     }
 
 
     async playAudio(forIndex = 0) {
-      const text = this.textSegments[forIndex]
+      const text = this.untranslatedTexts[forIndex]
       // const msg = new SpeechSynthesisUtterance(text);
       // msg.voice = speechSynthesis.getVoices().filter(function(voice) { return voice.name == 'Google 日本語'; })[0];
       // speechSynthesis.speak(msg);
