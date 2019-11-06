@@ -51,7 +51,10 @@
   const preloadRange = 15
 
   @Component({
-    components: {}
+    components: {},
+    mounted(): void {
+      this.allTexts = window.sessionStorage.getItem('temporary-input') || ''
+    }
   })
   export default class LoginPage extends Vue {
     isAddingText = true
@@ -75,7 +78,8 @@
     }
 
     @Watch('allTexts')
-    onTextChanged() {
+    onTextChanged(newValue) {
+      window.sessionStorage.setItem('temporary-input', newValue)
       this.isTextTranslated = {}
       this.untranslatedTexts = this.allTexts.split('\n').filter(Boolean).reduce((prev, item, index) => {
         prev[index] = item

@@ -2,6 +2,7 @@ import {randomString, debounce, ExtendedPromiseAll} from "../../../core/utils"
 import request from "./request"
 import * as md5 from 'md5'
 import * as EventEmitter from 'events'
+import { SessionCache } from "./cache"
 
 enum JobStage {
   finished = 1,
@@ -16,6 +17,24 @@ interface Job {
   translatedText?: string
   replyEvent: string
   stage: JobStage
+}
+
+class TranslatorCache {
+  private readonly cache: {[key: string]: string} = {}
+  private readonly storage = new SessionCache('T')
+  constructor() {
+    const cachedSessionKeys = this.storage.keys()
+    cachedSessionKeys.forEach(key => {
+      this.cache[key] = this.storage.getItem(key) || ''
+    })
+  }
+  get(key) {
+    return this.cache[key] || this.storage.getItem(key)
+  }
+  set(key, value) {
+    this.storage.setItem(key, value)
+    this.cache[key] = value
+  }
 }
 
 const TRANSLATION_MAX_LENGTH = 1500
@@ -86,7 +105,7 @@ export default class Translator {
   private readonly scheduleHandler: Function
   public engine
   
-  private cached: {[key: string]: string} = {}
+  private cached = new TranslatorCache()
 
   constructor({engine = 'youdao'} = {}) {
     this.engine = engine
@@ -94,7 +113,7 @@ export default class Translator {
       await scheduleDispatchJobs(this.queue, this.translate.bind(this))
       this.queue.filter(job => {
         if (job.stage === JobStage.finished && job.translatedText) {
-          this.cached[job.identifier] = job.translatedText
+          this.cached.set(job.identifier, job.translatedText)
           this.events.emit(job.replyEvent, job.translatedText)
           return false
         }
@@ -125,8 +144,9 @@ export default class Translator {
     return new Promise(resolve => {
       const identifier = md5(text)
       
-      if (this.cached[identifier]) {
-        return resolve(this.cached[identifier])
+      const cachedTranslation = this.cached.get(identifier)
+      if (cachedTranslation && typeof cachedTranslation=== 'string') {
+        return resolve(cachedTranslation)
       }
       
       const isExistJob = this.queue.some(job => job.identifier === identifier)
