@@ -16,26 +16,38 @@
       <div class="uk-flex uk-flex-column uk-flex-left" style="min-height: 200px">
         {{ currentTranslatedText }}
       </div>
-      <hr>
     </div>
 
-    <div class="uk-margin-small-top uk-text-muted">
+    <div class="uk-margin-small-top uk-margin-small-bottom uk-text-muted">
       No. {{ index }} / {{ size }}
     </div>
 
-    <div class="uk-flex uk-flex-around">
-      <button class="uk-button uk-button-default uk-button-large uk-width-1-4" @click="prev()"> Prev </button>
-      <button class="uk-button uk-button-default uk-button-large uk-width-1-4" @click="next()"> Next </button>
-      <button class="uk-button uk-button-default uk-button-large uk-width-1-4" @click="playAudio(index)"> Audio </button>
+    <div>
+      <button class="uk-button uk-button-default uk-button-large uk-width-1-1@s" @click="prev()"> Prev </button>
+      <button class="uk-button uk-button-default uk-button-large uk-width-1-1@s uk-margin-small-top" @click="next()"> Next </button>
+      <button class="uk-button uk-button-default uk-button-large uk-width-1-1@s uk-margin-small-top" @click="playAudio(index)"> Audio </button>
     </div>
 
     <div class="uk-margin-top">
-      <button class="uk-button uk-button-default" > {{ engine }}</button>
-      <div uk-dropdown="mode: click">
-        <ul class="uk-nav uk-dropdown-nav">
-          <li v-for="option in engines"> <a  @click="engine = option">{{ option }} </a></li>
-        </ul>
-      </div>
+      <ul uk-accordion>
+        <li>
+          <a class="uk-accordion-title" href="#"> Settings </a>
+          <div class="uk-accordion-content">
+            <div>
+              <p class="uk-text-muted uk-margin-small-bottom"> Translation Engine </p>
+              <button class="uk-button uk-button-default uk-width-1-1 uk-select" > {{ engine }}</button>
+              <div uk-dropdown="mode: click" class="uk-width-1-1">
+                <ul class="uk-nav uk-dropdown-nav">
+                  <li v-for="option in engines"> <a class="uk-padding" @click="engine = option">{{ option }} </a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="uk-margin-top">
+              <button class="uk-button uk-button-danger uk-width-1-1" @click="cleanSessionStorage"> Clean Session </button>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -54,6 +66,7 @@
     components: {},
     mounted(): void {
       this.allTexts = window.sessionStorage.getItem('temporary-input') || ''
+      this.index =  window.sessionStorage.getItem('temporary-input') || 0
     }
   })
   export default class LoginPage extends Vue {
@@ -137,6 +150,7 @@
 
     @Watch('index')
     async onIndexChanged(newIndex) {
+      window.sessionStorage.setItem('temporary-index', newIndex)
       return this.updateTranslations(newIndex)
     }
 
@@ -154,6 +168,11 @@
       const audio = new Audio(url)
       audio.play()
       // console.log('this.audioURL', this.audioURL)
+    }
+
+    cleanSessionStorage() {
+      window.sessionStorage.clear()
+      window.alert('Session Cleaned')
     }
 
   }
