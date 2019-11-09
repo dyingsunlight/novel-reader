@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+  novel-reader:
+    image: dyingsunlight/novel-reader:latest
+    restart: always
+    environment:
+      - SERVER_PORT=10011
+      - DATABASE_TYPE=sqlite
+      - DATABASE_SQLITE_PATH=/user/data/db.sqlite
+      # Or using mysql
+      # -
+      # DATABASE_TYPE=mysql,
+      # DATABASE_MYSQL_HOST=10.0.0.1,
+      # DATABASE_MYSQL_PORT=3306,
+      # DATABASE_MYSQL_USERNAME=root,
+      # DATABASE_MYSQL_PASSWORD=root,
+    volumes:
+      - ./.data:/user/data
+    ports:
+      - "10011:10011"
