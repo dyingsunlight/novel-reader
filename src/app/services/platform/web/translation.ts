@@ -107,7 +107,7 @@ function scheduleDispatchJobs(queue: Job[], translateHandler, { engine = 'youdao
         group[i].stage = JobStage.running
       }
       const translatedText = await translateHandler(fullText, { engine, marker})
-      const translatedTextFragments = translatedText.result.join('').split(marker)
+      const translatedTextFragments = translatedText.split(marker)
   
       for (let i = 0; i < group.length; i++) {
         group[i].translatedText = translatedTextFragments[i]

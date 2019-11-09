@@ -1,5 +1,6 @@
 import {Application} from 'express'
 import * as translator from 'translation.js'
+import TranslationController from '../controllers/translation'
 import Axios from 'axios'
 
 export default {
@@ -8,6 +9,7 @@ export default {
 
       const body = req.body || {}
       const engine = (body.engine || '').toLowerCase()
+      const marker = (body.marker || '').toLowerCase()
       const params = body.params
 
       if (!engine || !params || !translator[engine] || typeof params !== 'object') {
@@ -17,7 +19,7 @@ export default {
       
       let data
       try {
-         data = await translator[engine].translate(params)
+         data = await TranslationController.translate(params, { engine, marker})
       } catch (e) {
         console.error(e)
         res.sendStatus(500)
@@ -36,9 +38,7 @@ export default {
       const audioPipe = await Axios.get(audioURL, {
         responseType:'stream'
       })
-    
-      console.log('audioPipe.headers[\'content-type\']', audioPipe.headers['content-type'], audioPipe.headers)
-    
+      
       res.setHeader("content-type", audioPipe.headers['content-type']);
     
       audioPipe.data.pipe(res)

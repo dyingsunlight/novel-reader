@@ -1,8 +1,22 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "target": "esnext",
     "moduleResolution": "node",
-    "module": "commonjs"
-  },
-  "extends": "../tsconfig"
+    "module": "commonjs",
+    "outDir": "../../dist",
+    "paths": {
+      "app/*": [
+        "../app/*"
+      ],
+      "shared/*": [
+        "../shared/*"
+      ],
+      "web/*": [
+        "../web/*"
+      ]
+    },
+    "baseUrl": "."
+  }
 }

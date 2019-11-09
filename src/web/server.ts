@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import * as Express from 'express'
 import Router from './router'
 import PerformanceLogger from './middlewares/performer-logger'
