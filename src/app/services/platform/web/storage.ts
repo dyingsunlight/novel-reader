@@ -34,7 +34,7 @@ class BaseStorage {
     
     const indexes = this.keys()
     const existedIndex = indexes.indexOf(key)
-    console.log('existedIndex', existedIndex, indexes)
+
     if (~existedIndex) {
       indexes.splice(existedIndex, 1)
     }
