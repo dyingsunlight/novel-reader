@@ -84,11 +84,12 @@ const StateStorage = new Services.LocalStorage(StorageConstants.Names.ReaderStat
   async mounted() {
     this.isInitializing = true
     await this.restoreStateCache()
-    await this.updateTranslations(this.index)
     CACHE_STATE_LIST.forEach(stateName => {
       this.$watch(stateName, this.createStateCache)
     })
     this.isInitializing = false
+
+    await this.updateTranslations(this.index)
   }
 })
 export default class LoginPage extends Vue {
