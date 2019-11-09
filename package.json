@@ -24,7 +24,8 @@
     "sqlite3": "^4.1.0",
     "translation.js": "^0.7.12",
     "uikit": "^3.2.1",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "typeorm": "^0.2.20"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.1",
@@ -42,7 +43,6 @@
     "ts-node-dev": "^1.0.0-pre.42",
     "tsconfig-paths": "^3.8.0",
     "tscpaths": "0.0.9",
-    "typeorm": "^0.2.20",
     "typescript": "^3.6.2",
     "vue": "^2.6.10",
     "vue-class-component": "^7.1.0",
