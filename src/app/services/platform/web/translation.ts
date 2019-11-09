@@ -1,8 +1,8 @@
 import {randomString, debounce, ExtendedPromiseAll} from "../../../core/utils"
-import request from "./request"
+import request from "./library/request"
 import * as md5 from 'md5'
 import * as EventEmitter from 'events'
-import { SessionCache } from "./cache"
+import { SessionStorage } from "./storage"
 
 enum JobStage {
   finished = 1,
@@ -21,11 +21,14 @@ interface Job {
 
 class TranslatorCache {
   private readonly cache: {[key: string]: string} = {}
-  private readonly storage = new SessionCache('T')
+  private readonly storage = new SessionStorage('T')
   constructor() {
-    const cachedSessionKeys = this.storage.keys()
-    cachedSessionKeys.forEach(key => {
-      this.cache[key] = this.storage.getItem(key) || ''
+    this.init()
+  }
+  private async init() {
+    const cachedSessionKeys = await this.storage.keys()
+    cachedSessionKeys.forEach(async key => {
+      this.cache[key] = await this.storage.getItem(key) || ''
     })
   }
   get(key) {
@@ -39,7 +42,25 @@ class TranslatorCache {
 
 const TRANSLATION_MAX_LENGTH = 1500
 
-function scheduleDispatchJobs(queue: Job[], translateHandler) {
+async function translate(text: string, engine: string) {
+  const res = await request.post('/text/translation', {
+    engine: engine,
+    params: {
+      text,
+      to: 'zh-CN',
+      com: true
+    }
+  })
+  
+  if (res.status !== 200) {
+    console.error(res)
+    throw new Error("network error")
+  }
+  
+  return res.data
+}
+
+function scheduleDispatchJobs(queue: Job[], translateHandler, engine: string) {
   const jobGroups: Job[][] = []
   const availableJobs = queue.filter(job => job.stage !== JobStage.finished)
   
@@ -83,7 +104,7 @@ function scheduleDispatchJobs(queue: Job[], translateHandler) {
         group[i].stage = JobStage.running
       }
   
-      const translatedText = await translateHandler(fullText)
+      const translatedText = await translateHandler(fullText, engine)
       
       const translatedTextFragments = translatedText.result.join('\n').split(marker)
   
@@ -99,18 +120,16 @@ function scheduleDispatchJobs(queue: Job[], translateHandler) {
   return ExtendedPromiseAll(finalResult, 3)
 }
 
-export default class Translator {
+export class Translation implements NovelService.Translation {
   private readonly queue: Job[] = []
   private readonly events = new EventEmitter()
   private readonly scheduleHandler: Function
   public engine
-  
   private cached = new TranslatorCache()
-
   constructor({engine = 'youdao'} = {}) {
     this.engine = engine
     this.scheduleHandler = debounce(async () => {
-      await scheduleDispatchJobs(this.queue, this.translate.bind(this))
+      await scheduleDispatchJobs(this.queue, translate, this.engine)
       this.queue.filter(job => {
         if (job.stage === JobStage.finished && job.translatedText) {
           this.cached.set(job.identifier, job.translatedText)
@@ -121,26 +140,8 @@ export default class Translator {
       })
     }, 500, 2000)
   }
-
-  private async translate(text: string): Promise<string> {
-    const res = await request.post('/text/translation', {
-      engine: this.engine,
-      params: {
-        text,
-        to: 'zh-CN',
-        com: true
-      }
-    })
-    
-    if (res.status !== 200) {
-      console.error(res)
-      throw new Error("network error")
-    }
-    
-    return res.data
-  }
   
-  public async scheduleTranslate(text: string): Promise<string> {
+  async translate(text: string, engine): Promise<string> {
     return new Promise(resolve => {
       const identifier = md5(text)
       
@@ -168,5 +169,24 @@ export default class Translator {
       
       return this.scheduleHandler()
     })
+  }
+  
+  async audio(text: string): Promise<string> {
+    const res = await request.post('/text/audio', {
+      engine: 'baidu',
+      params: {
+        text,
+        com: true
+      }
+    })
+    
+    if (res.status !== 200) {
+      console.error(res)
+      throw new Error("network error")
+    }
+    
+    const url = res.data
+    
+    return request.url(`/text/audio?url=${encodeURIComponent(url)}`)
   }
 }

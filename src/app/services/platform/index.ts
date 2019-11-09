@@ -1,5 +1,5 @@
-import { WebService } from './web'
+import WebService from './web'
 
-const webService = new WebService()
+const Services: NovelService.Adaptor<NovelService.Translation, NovelService.SessionStorage, NovelService.LocalStorage> = WebService
 
-export default webService
+export default Services
