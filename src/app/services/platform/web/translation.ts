@@ -60,7 +60,7 @@ async function translate(text: string, engine: string) {
   return res.data
 }
 
-function scheduleDispatchJobs(queue: Job[], translateHandler, engine: string) {
+function scheduleDispatchJobs(queue: Job[], translateHandler, { engine = 'youdao'}) {
   const jobGroups: Job[][] = []
   const availableJobs = queue.filter(job => job.stage !== JobStage.finished)
   
@@ -95,18 +95,17 @@ function scheduleDispatchJobs(queue: Job[], translateHandler, engine: string) {
     finalResult.push(async function () {
       let marker
       while (!marker || group.some(job => job.text.includes(marker))) {
-        marker = `\n${randomString(4, '1234567890')}\n`
+        // Ensure Marker will not be translated
+        marker = `${randomString(6, `1234567890`)}`
       }
       // Only last member no need add extra marker
-      const fullText = group.reduce((prev, job, index) => prev + job.text + (index === group.length ? '' : marker), '')
+      const fullText =  group.map(job => job.text).join(`\n\n${marker}\n\n`)
   
       for (let i = 0; i < group.length; i++) {
         group[i].stage = JobStage.running
       }
-  
       const translatedText = await translateHandler(fullText, engine)
-      
-      const translatedTextFragments = translatedText.result.join('\n').split(marker)
+      const translatedTextFragments = translatedText.result.join('').split(marker)
   
       for (let i = 0; i < group.length; i++) {
         group[i].translatedText = translatedTextFragments[i]
@@ -129,7 +128,10 @@ export class Translation implements NovelService.Translation {
   constructor({engine = 'youdao'} = {}) {
     this.engine = engine
     this.scheduleHandler = debounce(async () => {
-      await scheduleDispatchJobs(this.queue, translate, this.engine)
+      const options = {
+        engine: this.engine,
+      }
+      await scheduleDispatchJobs(this.queue, translate, options)
       this.queue.filter(job => {
         if (job.stage === JobStage.finished && job.translatedText) {
           this.cached.set(job.identifier, job.translatedText)
