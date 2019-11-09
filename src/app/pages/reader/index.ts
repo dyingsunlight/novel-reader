@@ -1,4 +1,4 @@
-import startup from '../../core/startup'
+import startup from 'app/core/startup'
 import app from './components/app.vue'
 
 startup(app)

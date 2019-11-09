@@ -61,9 +61,9 @@
 import Component from 'vue-class-component'
 import Vue from 'vue'
 import {Watch} from 'vue-property-decorator'
-import {debounce, ExtendedPromiseAll} from "../../../core/utils"
-import * as StorageConstants from '../../../constants/storage'
-import Services from "../../../services/platform"
+import {debounce, ExtendedPromiseAll} from "shared/utils"
+import * as StorageConstants from 'app/constants/storage'
+import Services from "app/services/platform"
 
 
 const PRELOAD_RANGE_THRESHOLD = 10

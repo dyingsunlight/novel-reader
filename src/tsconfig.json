@@ -3,10 +3,21 @@
     "experimentalDecorators": true,
     "esModuleInterop": false,
     "target": "es5",
-    "baseUrl": "."
-    },
-    "typeRoots": [
-      "./",
-      "../node_modules/@types"
-    ]
+    "baseUrl": ".",
+    "paths": {
+      "app/*": [
+        "./app/*"
+      ],
+      "shared/*": [
+        "./shared/*"
+      ],
+      "web/*": [
+        "./web/*"
+      ]
+    }
+  },
+  "typeRoots": [
+    "./",
+    "../node_modules/@types"
+  ]
 }

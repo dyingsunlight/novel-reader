@@ -1,4 +1,4 @@
-import {randomString, debounce, ExtendedPromiseAll} from "../../../core/utils"
+import {randomString, debounce, ExtendedPromiseAll} from "shared/utils"
 import request from "./library/request"
 import * as md5 from 'md5'
 import * as EventEmitter from 'events'
@@ -42,9 +42,11 @@ class TranslatorCache {
 
 const TRANSLATION_MAX_LENGTH = 1500
 
-async function translate(text: string, engine: string) {
+async function translate(text: string, { engine = 'youdao', marker = ''} = {}) {
   const res = await request.post('/text/translation', {
-    engine: engine,
+    engine,
+    marker,
+    // Translation Params
     params: {
       text,
       to: 'zh-CN',
@@ -104,7 +106,7 @@ function scheduleDispatchJobs(queue: Job[], translateHandler, { engine = 'youdao
       for (let i = 0; i < group.length; i++) {
         group[i].stage = JobStage.running
       }
-      const translatedText = await translateHandler(fullText, engine)
+      const translatedText = await translateHandler(fullText, { engine, marker})
       const translatedTextFragments = translatedText.result.join('').split(marker)
   
       for (let i = 0; i < group.length; i++) {
