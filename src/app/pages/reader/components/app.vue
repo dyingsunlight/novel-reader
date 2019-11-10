@@ -85,7 +85,7 @@ const StateStorage = new Services.LocalStorage(StorageConstants.Names.ReaderStat
     this.isInitializing = true
     await this.restoreStateCache()
     CACHE_STATE_LIST.forEach(stateName => {
-      this.$watch(stateName, this.createStateCache)
+      this.$watch(() => this[stateName], this.createStateCache)
     })
     this.isInitializing = false
 
@@ -136,11 +136,13 @@ export default class LoginPage extends Vue {
   }
   @Watch('index', {immediate: true})
   async onIndexChanged(newIndex) {
+    console.log('onIndexChanged updateTranslations', this.index)
     return this.updateTranslations(newIndex)
   }
 
   handleTextInput(value) {
     this.rawText = value
+    console.log('handleTextInput', this.index)
     this.index = 0
   }
   prev() {
