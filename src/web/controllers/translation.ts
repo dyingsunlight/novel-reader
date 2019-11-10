@@ -1,13 +1,13 @@
 import * as translator from 'translation.js'
 import * as MD5 from 'md5'
 import db from '../database'
-import {ExtendedPromiseAll, randomString} from "shared/utils"
+import {ExtendedPromiseAll, randomString, joinTextWithMarker} from "shared/utils"
 
 export default {
   async translate(params, {engine = 'youdao', marker = '', to = 'zh-CN'} = {}) {
     
     const untranslatedTexts = (params.text || '').split(marker)
-    const translationStatistics: { hash: string, translatedText?: string, fromIndex: number }[] = []
+    let translationStatistics: { hash: string, translatedText?: string, fromIndex: number }[] = []
     
     //
     // 1. Check text hash whether was translated
@@ -40,6 +40,9 @@ export default {
         }
       }
     }), 12)
+    
+    // Resort to ensure text was consistency
+    translationStatistics = translationStatistics.sort((a, b) => a.fromIndex > b.fromIndex ? 1 : -1)
   
     //
     // 2. Retrieve translation using database cache and translation API .
@@ -60,7 +63,7 @@ export default {
       while (!internalMarker || mappedTextTranslations.some(text => text.includes(internalMarker))) {
         internalMarker = `${randomString(6, `1234567890`)}`
       }
-      const fullText = mappedTextTranslations.join(`\n${internalMarker}\n`)
+      const fullText = joinTextWithMarker(mappedTextTranslations, internalMarker)
       const data = await translator[engine].translate({...params, text: fullText})
       translatedTexts = data.result.join('').split(internalMarker)
       
@@ -73,11 +76,14 @@ export default {
     //
     // 3. Done
     //
-    return translationStatistics.map((text, index) => {
+    return joinTextWithMarker(translationStatistics.map((text, index) => {
+      let result
       if (!text.hasOwnProperty('translatedText')) {
-        return translatedTexts[text.fromIndex]
+        result = translatedTexts[text.fromIndex]
+      } else {
+        result = text.translatedText
       }
-      return text.translatedText
-    }).join(marker)
+      return result
+    }), marker)
   }
 }

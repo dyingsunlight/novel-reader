@@ -1,4 +1,4 @@
-import {randomString, debounce, ExtendedPromiseAll} from "shared/utils"
+import {randomString, debounce, ExtendedPromiseAll, joinTextWithMarker} from "shared/utils"
 import request from "./library/request"
 import * as md5 from 'md5'
 import * as EventEmitter from 'events'
@@ -101,7 +101,7 @@ function scheduleDispatchJobs(queue: Job[], translateHandler, { engine = 'youdao
         marker = `${randomString(6, `1234567890`)}`
       }
       // Only last member no need add extra marker
-      const fullText =  group.map(job => job.text).join(`\n\n${marker}\n\n`)
+      const fullText =  joinTextWithMarker(group.map(job => job.text), marker)
   
       for (let i = 0; i < group.length; i++) {
         group[i].stage = JobStage.running

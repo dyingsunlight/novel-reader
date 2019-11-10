@@ -69,3 +69,8 @@ export function debounce(handler: Function, duration: number = 500, limit = Numb
     }
   }
 }
+
+
+export function joinTextWithMarker(texts: string[], marker: string) {
+  return texts.join(`\n\n${marker}\n\n`)
+}
