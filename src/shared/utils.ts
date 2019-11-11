@@ -74,3 +74,11 @@ export function debounce(handler: Function, duration: number = 500, limit = Numb
 export function joinTextWithMarker(texts: string[], marker: string) {
   return texts.join(`\n\n${marker}\n\n`)
 }
+
+export function generateMarker(forText: string[]) {
+  let internalMarker
+  while (!internalMarker || forText.some(text => text.includes(internalMarker))) {
+    internalMarker = `${randomString(6, `1234567890`)}`
+  }
+  return internalMarker
+}
