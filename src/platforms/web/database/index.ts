@@ -1,5 +1,6 @@
 import { Connection, createConnection } from 'typeorm'
 import { Translation } from "./entities"
+import { PATH } from "platforms/constants"
 import * as Path from "path"
 
 class DataBase {
@@ -30,7 +31,7 @@ class DataBase {
         })
         break
       default:
-        const sqlitePath = Path.resolve(__dirname, '../../../', process.env['DATABASE_SQLITE_PATH'] || '.data/database.sqlite')
+        const sqlitePath = Path.resolve(PATH.DATA, process.env['DATABASE_SQLITE_NAME'] || 'database.sqlite')
         console.log('Sqlite Path is: ', sqlitePath)
         this.connection = await createConnection({
           type: "sqlite",

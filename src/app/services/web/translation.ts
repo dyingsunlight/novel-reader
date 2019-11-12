@@ -1,8 +1,8 @@
 import {randomString, debounce, ExtendedPromiseAll, joinTextWithMarker} from "shared/utils"
-import request from "./library/request"
+import request from "app/services/web/library/request"
 import * as md5 from 'md5'
 import * as EventEmitter from 'events'
-import { SessionStorage } from "./storage"
+import { SessionStorage } from "app/services/web/storage"
 
 enum JobStage {
   finished = 1,
@@ -121,7 +121,7 @@ function scheduleDispatchJobs(queue: Job[], translateHandler, { engine = 'youdao
   return ExtendedPromiseAll(finalResult, 3)
 }
 
-export class Translation implements NovelService.Translation {
+export class Translation implements NovelAppService.Translation {
   private readonly queue: Job[] = []
   private readonly events = new EventEmitter()
   private readonly scheduleHandler: Function

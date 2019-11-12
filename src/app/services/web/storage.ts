@@ -72,7 +72,7 @@ class BaseStorage {
   }
 }
 
-export class SessionStorage implements NovelService.SessionStorage {
+export class SessionStorage implements NovelAppService.SessionStorage {
   private readonly baseStorage: BaseStorage
   constructor(prefix = '') {
     this.baseStorage = new BaseStorage(prefix, window.sessionStorage)
@@ -97,7 +97,7 @@ export class SessionStorage implements NovelService.SessionStorage {
   }
 }
 
-export class LocalStorage implements NovelService.LocalStorage {
+export class LocalStorage implements NovelAppService.LocalStorage {
   private readonly baseStorage: BaseStorage
   
   constructor(prefix = '') {

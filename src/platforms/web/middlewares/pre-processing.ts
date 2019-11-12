@@ -5,6 +5,7 @@ import {Application} from 'express'
 export default {
   setup(app: Application) {
     app.use(CORS())
-    app.use(Bodyparse())
+    app.use(Bodyparse.urlencoded({extended: true}))
+    app.use(Bodyparse.json())
   }
 }

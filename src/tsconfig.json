@@ -2,6 +2,7 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "esModuleInterop": false,
+    "emitDecoratorMetadata": true,
     "target": "es5",
     "baseUrl": ".",
     "paths": {
@@ -11,8 +12,8 @@
       "shared/*": [
         "./shared/*"
       ],
-      "web/*": [
-        "./web/*"
+      "platforms/*": [
+        "./platforms/*"
       ]
     }
   },

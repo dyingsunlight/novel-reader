@@ -7,14 +7,13 @@ import AssetsHosting from './middlewares/assets-hosting'
 
 const app = Express()
 
-
 PreProcessing.setup(app)
 PerformanceLogger.setup(app)
 Router.setup(app)
 AssetsHosting.setup(app)
 
-app.listen(process.env['SERVER_PORT'] || 10009);
+const usingPort = process.env['SERVER_PORT'] || 10009
+app.listen(usingPort);
 
 console.log(process.env['SERVER_READY_IDENTIFIER'] || '')
-
-console.log('Server Ready!')
+console.log(`Server is listening at: \nhttp://localhost:${usingPort}`)
