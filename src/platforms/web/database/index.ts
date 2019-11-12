@@ -31,7 +31,7 @@ class DataBase {
         })
         break
       default:
-        const sqlitePath = Path.resolve(PATH.DATA, process.env['DATABASE_SQLITE_NAME'] || 'database.sqlite')
+        const sqlitePath = process.env['DATABASE_SQLITE_PATH'] || Path.resolve(PATH.DATA, './.data/database.sqlite')
         console.log('Sqlite Path is: ', sqlitePath)
         this.connection = await createConnection({
           type: "sqlite",
