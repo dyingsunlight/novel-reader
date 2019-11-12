@@ -31,14 +31,20 @@
         Next
       </button>
       <button class="uk-button uk-button-default uk-button-large uk-width-1-1@s uk-margin-small-top"
-              @click="playAudio(index)"> Audio
+              @click="playAudio(index)"> Speaking
       </button>
     </div>
 
     <div class="uk-margin-small-top uk-margin-small-bottom uk-text-muted uk-flex uk-flex-middle">
       Total: {{ maxIndex }}, Current :
       <label class="uk-form-controls uk-margin-small-left">
-        <input class="uk-input" v-model="index" type="number" :max="maxIndex" :min="minIndex" step="1">
+        <input class="uk-input"
+               :value="index"
+               @blur="index = $event.target.value"
+               @keydown.enter = "index = $event.target.value"
+               type="number"
+               :max="maxIndex"
+               :min="minIndex" step="1">
       </label>
     </div>
 
@@ -51,7 +57,35 @@
         </ul>
       </div>
     </div>
-    <div class="uk-margin-top">
+
+    <div class="uk-margin-top" v-if="isSupportBrowserSpeaking">
+      <p class="uk-text-muted uk-margin-small-bottom"> Speaking Engine </p>
+      <div class="uk-margin-small-top uk-flex uk-flex-middle">
+        <label class="uk-form-label uk-margin-right">
+          <input class="uk-radio" type="radio" id="one" value="browser" v-model="speakingEngine">
+          Browser
+        </label>
+        <br>
+        <label class="uk-form-label">
+          <input class="uk-radio" type="radio" id="two" value="baidu" v-model="speakingEngine">
+          Baidu
+        </label>
+      </div>
+      <template v-if="speakingEngine === 'browser'">
+        <p class="uk-text-muted uk-margin-top uk-margin-remove-bottom"> Speaking Rate </p>
+        <div class="uk-margin-small-top uk-flex uk-flex-middle">
+          <input class="uk-range uk-width-1-1" type="range" value="1" min="0.75" max="2" step="0.01" v-model="speakingRate">
+          <span class="uk-margin-small-left"> {{ Math.round(speakingRate * 100) }}% </span>
+        </div>
+        <p class="uk-text-muted uk-margin-top uk-margin-remove-bottom"> Speaking Pith </p>
+        <div class="uk-margin-small-top uk-flex uk-flex-middle">
+          <input class="uk-range uk-width-1-1" type="range" value="1" min="0.75" max="2" step="0.01" v-model="speakingPitch">
+          <span class="uk-margin-small-left"> {{ Math.round(speakingPitch * 100) }}% </span>
+        </div>
+      </template>
+    </div>
+
+    <div class="uk-margin-large-top">
       <button class="uk-button uk-button-danger uk-width-1-1" @click="clearStateCache"> Clean Session</button>
     </div>
   </div>
@@ -82,6 +116,9 @@ const StateStorage = new Services.LocalStorage(StorageConstants.Names.ReaderStat
     this.createStateCache = debounce(this.createStateCache.bind(this))
   },
   async mounted() {
+    if ('speechSynthesis' in window) {
+      this.isSupportBrowserSpeaking = true
+    }
     this.isInitializing = true
     await this.restoreStateCache()
     CACHE_STATE_LIST.forEach(stateName => {
@@ -106,6 +143,12 @@ export default class LoginPage extends Vue {
     'google',
     'baidu'
   ]
+
+  speakingEngine = 'browser'
+  speakingRate = 1
+  speakingPitch = 1
+  isSpeaking = false
+  isSupportBrowserSpeaking = false
 
   //
   // Computed
@@ -184,17 +227,20 @@ export default class LoginPage extends Vue {
 
   async playAudio(forIndex = 0) {
     const text = this.untranslatedTexts[forIndex]
-    // const msg = new SpeechSynthesisUtterance(text);
-    // msg.voice = speechSynthesis.getVoices().filter(function(voice) { return voice.name == 'Google 日本語'; })[0];
-    // speechSynthesis.speak(msg);
-
-    // fallback
     if (!text) return
-    const url = await Translator.audio(text)
-    // console.log('url', url)
-    const audio = new Audio(url)
-    audio.play()
-    // console.log('this.audioURL', this.audioURL)
+    if (this.speakingEngine === 'baidu' || !this.isSupportBrowserSpeaking) {
+      const url = await Translator.audio(text)
+      const audio = new Audio(url)
+      audio.play()
+    } else {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.voice = speechSynthesis.getVoices().filter((voice) =>  voice.lang === 'ja-JP')[0]
+      msg.lang = 'ja-JP'
+      msg.rate = Number(this.speakingRate) || 1
+      msg.pitch = Number(this.speakingPitch) || 1
+      console.log( msg.rate)
+      speechSynthesis.speak(msg);
+    }
   }
 
   async restoreStateCache() {

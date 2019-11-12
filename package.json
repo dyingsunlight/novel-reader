@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "web-dev": "cross-env WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node ./scripts/server.ts",
-    "web-backend-server": "cross-env WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node --project ./src/platforms/web/tsconfig.json -r tsconfig-paths/register ./src/platforms/web/server.ts",
+    "web-backend-server": "cross-env WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node --project ./src/tsconfig-platforms.json -r tsconfig-paths/register ./src/platforms/web/server.ts",
     "build:web-server": "tsc -p src/tsconfig-platforms.json --outDir dist && tscpaths -p src/tsconfig-platforms --src src -o dist",
     "build:web-app": "parcel build src/app/pages/**/*.html -d dist/platforms/web/app --public-url=./ --no-source-maps",
     "build:web": "npm run build:web-server && npm run build:web-app"
