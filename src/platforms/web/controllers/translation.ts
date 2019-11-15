@@ -1,7 +1,8 @@
 import * as translator from 'translation.js'
 import * as MD5 from 'md5'
 import db from '../database'
-import {ExtendedPromiseAll, randomString, joinTextWithMarker, generateMarker} from "shared/utils"
+import {ExtendedPromiseAll, joinTextWithMarker, generateMarker} from "shared/utils"
+import { SiteResolver } from 'platforms/services'
 
 export default {
   async translate(params, {engine = 'youdao', marker = '', to = 'zh-CN'} = {}) {

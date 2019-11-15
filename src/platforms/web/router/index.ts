@@ -1,6 +1,7 @@
-import {Application} from 'express'
+import {Application, Request, Response} from 'express'
 import * as translator from 'translation.js'
 import TranslationController from '../controllers/translation'
+import SiteResolverController from '../controllers/site-resolver'
 import Axios from 'axios'
 
 export default {
@@ -66,6 +67,40 @@ export default {
       res.send(audioURL)
 
     })
+  
+    app.get('/novel/meta', async (req: Request, res: Response, next) => {
+      const url = req.query['url']
+      if (!url) {
+        res.sendStatus(400)
+        return
+      }
+      
+      try {
+        const data = await SiteResolverController.getMeta(url)
+        res.contentType('application/json')
+        res.send(data)
+      } catch (e) {
+        console.error(e)
+        res.sendStatus(500)
+      }
+    })
     
+    app.get('/novel/chapter', async (req: Request, res: Response, next) => {
+      const url = req.query['url']
+      if (!url) {
+        res.sendStatus(400)
+        return
+      }
+    
+      try {
+        const data = await SiteResolverController.getChapter(url)
+        res.contentType('text/plain')
+        res.send(data)
+      } catch (e) {
+        console.error(e)
+        res.sendStatus(500)
+      }
+    
+    })
   }
 }
