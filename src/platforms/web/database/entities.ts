@@ -8,19 +8,3 @@ export class Translation {
   @Column()
   text: string
 }
-
-
-@Entity()
-export class Novel {
-  @PrimaryGeneratedColumn()
-  id: string
-  
-  @Column()
-  name: string
-  
-  @Column()
-  type: string
-  
-  @Column()
-  content: string
-}

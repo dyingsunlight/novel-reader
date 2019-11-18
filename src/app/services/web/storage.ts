@@ -1,3 +1,5 @@
+import {NovelAppService} from "novel-model"
+
 class BaseStorage {
   public readonly prefix: string = ''
   public readonly indexesKey = 'indexes'
@@ -115,6 +117,7 @@ export class LocalStorage implements NovelAppService.LocalStorage {
   async sizes() {
     return this.baseStorage.sizes()
   }
+  
   async keys() {
     return this.baseStorage.keys()
   }

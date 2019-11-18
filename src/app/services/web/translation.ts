@@ -3,6 +3,7 @@ import request from "app/services/web/library/request"
 import * as md5 from 'md5'
 import * as EventEmitter from 'events'
 import { SessionStorage } from "app/services/web/storage"
+import {NovelAppService} from "novel-model"
 
 enum JobStage {
   finished = 1,

@@ -1,5 +1,7 @@
 import WebService from 'app/services/web'
 
-const Services: NovelAppService.Adaptor<NovelAppService.Translation, NovelAppService.SessionStorage, NovelAppService.LocalStorage> = WebService
+const Services = WebService
 
-export default Services
+export const Translation = Services.Translation
+export const SessionStorage = Services.SessionStorage
+export const LocalStorage = Services.LocalStorage

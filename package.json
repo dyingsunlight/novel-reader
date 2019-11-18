@@ -4,15 +4,18 @@
   "scripts": {
     "web-dev": "cross-env WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node ./scripts/server.ts",
     "web-backend-server": "cross-env WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node --project ./src/tsconfig-platforms.json -r tsconfig-paths/register ./src/platforms/web/server.ts",
-    "build:web-server": "tsc -p src/tsconfig-platforms.json --outDir dist && tscpaths -p src/tsconfig-platforms --src src -o dist",
+    "build:web-server": "tsc -p ./src/tsconfig-platforms.json --outDir dist && tscpaths -p src/tsconfig-platforms --src src -o dist",
     "build:web-app": "parcel build src/app/pages/**/*.html -d dist/platforms/web/app --public-url=./ --no-source-maps",
     "build:web": "npm run build:web-server && npm run build:web-app"
   },
   "dependencies": {
+    "@types/cheerio": "^0.22.14",
     "@types/events": "^3.0.0",
     "@types/md5": "^2.1.33",
+    "@vue/composition-api": "^0.3.2",
     "axios": "^0.19.0",
     "body-parser": "^1.19.0",
+    "cheerio": "^1.0.0-rc.3",
     "cors": "^2.8.5",
     "events": "^3.0.0",
     "express": "^4.17.1",
@@ -20,12 +23,14 @@
     "fs-extra": "^8.1.0",
     "js-base64": "^2.5.1",
     "md5": "^2.2.1",
+    "minio": "^7.0.12",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^4.1.0",
     "translation.js": "^0.7.12",
+    "typeorm": "^0.2.20",
     "uikit": "^3.2.1",
     "uuid": "^3.3.3",
-    "typeorm": "^0.2.20"
+    "vuex-class": "^0.3.2"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.1",
