@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { Store } from 'vuex'
-import { createComponent, computed, ref, reactive, onMounted } from '@vue/composition-api'
+import { createComponent, computed, ref, watch, onMounted } from '@vue/composition-api'
 import { Store as AppStore } from "../local-model"
 import UIkit from 'app/uikit'
 import Router from 'vue-router'
@@ -68,8 +68,17 @@ export default createComponent({
       }
     })
 
+
+
     const isReady = computed(() => <boolean>store.getters['collection/isReady'] )
     const collection = computed(() => <Services.ResolvedMeta | void>store.getters['collection/items'].find(item => item.id === props.id))
+
+    watch(() => isReady.value , async () => {
+      if (isReady.value && !collection.value) {
+        await UIkit.modal.alert('Invalid collection, please check whether this url was supported or add it to collection first!')
+        router.push('/collection')
+      }
+    })
 
     const title = computed(() => (collection.value && collection.value.title) || '')
     const catalog = computed(() => (collection.value && collection.value.contents) || [])

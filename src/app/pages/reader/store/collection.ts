@@ -16,7 +16,7 @@ export default <Module<Collection, null>>{
       }
     },
     items(state) {
-      return state.items
+      return state.items || []
     },
     isReady(state) {
       return ['plugin:local-storage']

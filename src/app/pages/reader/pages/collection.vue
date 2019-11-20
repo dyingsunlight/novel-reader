@@ -9,7 +9,7 @@
   <div class="uk-height-1-1 uk-margin-small-top">
     <div v-for="collection in collections">
       <ul class="uk-margin-remove uk-padding-remove">
-        <li class="uk-flex uk-flex-middle uk-position-relative uk-flex-between">
+        <li class="uk-flex uk-flex-middle uk-position-relative uk-flex-between" style="margin-bottom: 40px">
           <span class="collection-title uk-button uk-button-link uk-text-left" @click="handleGotoNovelFrontCover(collection.id)"> {{ collection.title }} </span>
           <span class="collection-introduction uk-text-small uk-text-muted">
             <span>
@@ -37,7 +37,7 @@
         <div class="uk-margin">
           <label class="uk-form-label" for="form-stacked-text">Novel URL</label>
           <div class="uk-form-controls">
-            <input class="uk-input" id="form-stacked-text" type="text" placeholder="" :disabled="isFetchingContent" v-model="url">
+            <input class="uk-input" id="form-stacked-text" type="text" placeholder="" :disabled="isFetchingContent" v-model="url" autofocus>
           </div>
         </div>
 

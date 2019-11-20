@@ -86,12 +86,12 @@ export default createComponent({
     const isReady = computed(() => {
       return store.getters['preference/isReady'] && store.getters['reader/isReady']
     })
-    const fullText =  computed<number>(() => store.getters['reader/fullText'])
+    const fullText =  computed<string>(() => store.getters['reader/fullText'] || '')
     const textSizes = computed<number>(() => store.getters['reader/size'])
-    const indicator = computed<number>(() => store.getters['reader/indicator'])
+    const indicator = computed<number>(() => store.getters['reader/indicator'] || 0)
     const translatedTexts = computed<string[]>(() => store.getters['reader/translatedTexts'])
     const untranslatedTexts = computed<string[]>(() => store.getters['reader/untranslatedTexts'])
-    const isLoading = computed<boolean>(() => !translatedTexts.value[indicator.value])
+    const isLoading = computed<boolean>(() => !translatedTexts.value[indicator.value] && fullText.value.length !== 0 && indicator.value !== undefined)
     const preference = computed<PreferenceState>(() => store.state.preference)
     const maxIndicator = computed(() => Math.max(textSizes.value - 1, 0))
     const minIndicator = ref(0)

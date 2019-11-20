@@ -18,7 +18,7 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
   
   private parseURL(url: string) {
     if (!this.test(url)) return {}
-    const [full, novelId, chapterId] = /kakuyomu\.jp\/works\/([^\/]+)\/episodes\/?([^\/]+)\/?/ig.exec(url)
+    const [full, novelId, chapterId] = /kakuyomu\.jp\/works\/([^\/]+)\/episodes\/?([^\/]+)\/?/ig.exec(url) || /kakuyomu\.jp\/works\/([^\/]+)\/?/i.exec(url)
     return {
       novelId,
       chapterId
@@ -73,7 +73,7 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
       } else if (lastContent) {
         item.title = $el.find('span.widget-toc-episode-titleLabel').text()
         item.created = $el.find('time.widget-toc-episode-datePublished').attr('datetime')
-        item.url = resolver.domain + '/' + $el.find('> a').attr('href')
+        item.url = resolver.domain + $el.find('> a').attr('href')
         lastContent.children.push(item)
       }
     })
@@ -97,6 +97,7 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
   }
   
   async getChapter(url: string) {
+    console.log('url', url)
     if (!this.test(url)) return
     const {novelId, chapterId} = this.parseURL(url)
     if (!novelId || !chapterId) return

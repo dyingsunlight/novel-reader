@@ -20,8 +20,8 @@ export default <Module<ReaderState, null>>{
     },
     localStorage(state) {
       return {
-        indicator: state.indicator,
-        fullText: state.fullText
+        indicator: state.indicator || 0,
+        fullText: state.fullText  || ''
       }
     },
     isReady(state) {

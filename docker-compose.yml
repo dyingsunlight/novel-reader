@@ -8,6 +8,8 @@ services:
       - SERVER_PORT=10011
       - DATABASE_TYPE=sqlite
       - DATABASE_SQLITE_PATH=/user/data/db.sqlite
+      - PLATFORMS_SERVICE_PROXY_ENABLE=true
+      - PLATFORMS_SERVICE_PROXY_HOST=host.docker.internal
       # Or using mysql
       # -
       # DATABASE_TYPE=mysql,
