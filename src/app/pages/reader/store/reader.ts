@@ -1,12 +1,6 @@
 import { Module } from "vuex"
 import vue from 'vue'
-import { BaseStoreState } from "app/app-model"
-
-interface ReaderState extends BaseStoreState{
-  fullText?: string
-  indicator?: number
-  translatedTexts?: {[key: string]: string}
-}
+import { ReaderState } from "../local-model"
 
 export default <Module<ReaderState, null>>{
   namespaced: true,

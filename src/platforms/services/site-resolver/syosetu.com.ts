@@ -1,9 +1,9 @@
-import Axios from 'axios'
 import * as Cheerio from 'cheerio'
 import {FileCache} from '../controllers'
 import {NovelServices} from "novel-model"
 import {FILE_CACHE_ALIVE_TIME} from "./constants"
 import Request from "./request"
+import * as MD5 from 'md5'
 
 export class SyosetuResolver implements NovelServices.RuleResolver {
   public readonly domain = 'ncode.syosetu.com'
@@ -45,7 +45,7 @@ export class SyosetuResolver implements NovelServices.RuleResolver {
     //
     
     // Fetch
-    const response = await Request.get(novelHomePage, {}, { proxy: true})
+    const response = await Request.get(novelHomePage, {})
     if (response.status !== 200) {
       throw new Error('Request fail')
     }
@@ -71,13 +71,14 @@ export class SyosetuResolver implements NovelServices.RuleResolver {
         item.title = $el.find('.subtitle').text()
         item.updated = $el.find('.long_update > span[title]').attr('title')
         item.created = $el.find('.long_update ').text()
-        item.url = 'https://ncode.syosetu.com/' + $el.find('.subtitle a').attr('href')
+        item.url = 'https://ncode.syosetu.com' + $el.find('.subtitle a').attr('href')
         lastContent.children.push(item)
       }
     })
     
     const meta: NovelServices.Meta = {
       title,
+      id: MD5(novelHomePage),
       authors: [$('#novel_color .novel_writername a').text()],
       description: $('#novel_ex').text(),
       publishers: ['ncode.syosetu.com'],
@@ -101,7 +102,7 @@ export class SyosetuResolver implements NovelServices.RuleResolver {
     if (cachedMeta) return cachedMeta
   
     const novelPageURL = `http://ncode.syosetu.com/${novelId}/${chapterId}/`
-    const {data} = await Axios.get(novelPageURL)
+    const {data} = await Request.get(novelPageURL, {})
     const $ = Cheerio.load(data, {decodeEntities: false})
     const content = $('#novel_honbun').text()
     await FileCache.set(this.getCachePath(novelId, chapterId), content)

@@ -1,8 +1,10 @@
-import { SessionStorage, LocalStorage } from "app/services/web/storage"
-import { Translation } from 'app/services/web/translation'
+import { SessionStorage, LocalStorage } from "./storage"
+import { Translation } from './translation'
+import Resolver from './resolver'
 
 export default {
   Translation,
   SessionStorage,
-  LocalStorage
+  LocalStorage,
+  Resolver
 }

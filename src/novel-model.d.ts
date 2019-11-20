@@ -1,29 +1,3 @@
-export declare namespace NovelAppService {
-  
-  export abstract class Translation {
-    abstract translate(text: string, toLang: string): Promise<string>
-    abstract audio(text: string): Promise<string>
-  }
-  
-  class Storage {
-    
-     getItem(key: string): Promise<string>
-  
-     setItem(key: string, value: string): Promise<void>
-  
-     removeItem(key: string): Promise<void>
-  
-     keys(): Promise<string[]>
-  
-     sizes(): Promise<number>
-  }
-  
-  export abstract class SessionStorage extends Storage {}
-  
-  export abstract class LocalStorage extends Storage {}
-  
-}
-
 export declare namespace NovelServices {
   
   export interface ContentsItem {
@@ -38,15 +12,16 @@ export declare namespace NovelServices {
   }
   
   export interface Meta {
+    id: string
+    url : string
     title: string
     description: string
     subtitle?: string
     prefix?:string
     suffix?:string
-    
+    contents: ContentsItem[]
     authors: string[]
     publishers: string[]
-    url ?: string
   }
   
   export abstract class RuleResolver {

@@ -1,4 +1,4 @@
-import {NovelAppService} from "novel-model"
+import {Services} from "app/app-model"
 
 class BaseStorage {
   public readonly prefix: string = ''
@@ -74,7 +74,7 @@ class BaseStorage {
   }
 }
 
-export class SessionStorage implements NovelAppService.SessionStorage {
+export class SessionStorage implements Services.SessionStorage {
   private readonly baseStorage: BaseStorage
   constructor(prefix = '') {
     this.baseStorage = new BaseStorage(prefix, window.sessionStorage)
@@ -99,7 +99,7 @@ export class SessionStorage implements NovelAppService.SessionStorage {
   }
 }
 
-export class LocalStorage implements NovelAppService.LocalStorage {
+export class LocalStorage implements Services.LocalStorage {
   private readonly baseStorage: BaseStorage
   
   constructor(prefix = '') {

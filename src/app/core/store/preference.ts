@@ -44,9 +44,9 @@ export default <Module<PreferenceState, null>>{
   },
   mutations: {
     update(state: PreferenceState, payload: PreferenceState) {
-      const isSupportBroswerSpeaking = 'speechSynthesis' in window
+      const isSupportBrowserSpeaking = 'speechSynthesis' in window
       
-      if (!isSupportBroswerSpeaking) {
+      if (!isSupportBrowserSpeaking) {
         payload.speakingEngines = payload.speakingEngines.slice(0).filter(engine => engine !== 'browser')
         payload.speakingEngine = payload.speakingEngines[0] || 'google'
       }

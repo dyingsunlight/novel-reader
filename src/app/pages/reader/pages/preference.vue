@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <div class="uk-section">
+    <button @click="handleGoBack" class="uk-button uk-button-default uk-width-1-1"> < Back </button>
+
     <div class="uk-margin-top">
       <p class="uk-text-muted uk-margin-small-bottom"> Translation Engine </p>
       <button class="uk-button uk-button-default uk-width-1-1 uk-select"> {{ preference.translationEngine }}</button>
@@ -9,6 +11,7 @@
         </ul>
       </div>
     </div>
+
     <div class="uk-margin-top">
       <p class="uk-text-muted uk-margin-small-bottom"> Speaking Engine </p>
       <div class="uk-margin-small-top uk-flex uk-flex-middle">
@@ -40,13 +43,16 @@
 
 <script lang="ts">
 import { Store } from 'vuex'
+import Router from 'vue-router'
 import { createComponent, ref, watch } from '@vue/composition-api'
-import {PreferenceState, Store as AppStore} from "app/app-model"
+import { PreferenceState, Store as AppStore } from "../local-model"
 
 export default createComponent({
   name: 'preference',
   setup(props, context) {
     const store = context.root.$store as Store<AppStore>
+    const router = context.root.$router as Router
+
     let preference = ref<PreferenceState>({})
 
     watch(() => store.getters['preference/snapshot'], (newValue) => {
@@ -59,8 +65,13 @@ export default createComponent({
       }
     }, { deep: true })
 
+    const handleGoBack = () => {
+      router.go(-1)
+    }
+
     return {
-      preference
+      preference,
+      handleGoBack
     }
   },
 })

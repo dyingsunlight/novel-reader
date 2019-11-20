@@ -1,9 +1,11 @@
 import Axios from 'axios'
 
+const usingProxy =  !!process.env['PLATFORMS_SERVICE_PROXY_ENABLE']
+
 const proxyConfig = {
-  host: process.env['PLATFORMS_SERVICE_PROXY_HOST'] || '',
-  port: process.env['PLATFORMS_SERVICE_PROXY_PORT'] || '',
-  protocol: process.env['PLATFORMS_SERVICE_PROXY_PROTOCOL'] || '',
+  host: process.env['PLATFORMS_SERVICE_PROXY_HOST'] || '127.0.0.1',
+  port: process.env['PLATFORMS_SERVICE_PROXY_PORT'] || '1080',
+  protocol: process.env['PLATFORMS_SERVICE_PROXY_PROTOCOL'] || 'http',
   username: process.env['PLATFORMS_SERVICE_PROXY_USERNAME'] || '',
   password: process.env['PLATFORMS_SERVICE_PROXY_PASSWORD'] || '',
 }
@@ -39,30 +41,30 @@ const getConfig = (config, {proxy = false}) => {
 }
 
 export default {
-  async get(url, config = {}, {proxy = false}= {}) {
+  async get(url, config = {}, options = {}) {
     try {
-      return await Axios.get(url, getConfig(config, {proxy}))
+      return await Axios.get(url, getConfig(config, {proxy: usingProxy}))
     } catch (e) {
       return e.response
     }
   },
-  async post(url, body?, config?, {proxy = false} = {}) {
+  async post(url, body?, config?, options = {}) {
     try {
-      return await Axios.post(url, body, getConfig(config, {proxy}))
+      return await Axios.post(url, body, getConfig(config, {proxy: usingProxy}))
     } catch (e) {
       return e.response
     }
   },
-  async put(url, body?, config?, {proxy = false}  = {}) {
+  async put(url, body?, config?, options = {}) {
     try {
-      return await Axios.put(url, body, getConfig(config, {proxy}))
+      return await Axios.put(url, body, getConfig(config, {proxy: usingProxy}))
     } catch (e) {
       return e.response
     }
   },
-  async delete(url, config?, {proxy = false} = {}) {
+  async delete(url, config?, options = {}) {
     try {
-      return await Axios.delete(url, getConfig(config, {proxy}))
+      return await Axios.delete(url, getConfig(config, {proxy: usingProxy}))
     } catch (e) {
       return e.response
     }

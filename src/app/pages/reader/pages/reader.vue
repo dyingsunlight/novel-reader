@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="uk-margin-large-bottom">
     <div class="uk-flex uk-flex-column uk-padding-small">
       <button class="uk-button uk-button-default uk-width-1-1" @click="handleTextareaToggle">
         Toggle Text Editor
@@ -45,16 +45,22 @@
                :min="minIndicator" step="1">
       </label>
     </div>
+    <button class="uk-button uk-button-default uk-button-large uk-width-1-1" @click="handleGoBack">
+      < Back
+    </button>
+    <LoadingComponent v-if="!isReady || isLoading"></LoadingComponent>
   </div>
 </template>
 
 <script lang="ts">
 
 import { Store } from 'vuex'
+import Router from 'vue-router'
 import { createComponent, ref, onBeforeMount, computed, watch } from '@vue/composition-api'
 import { ExtendedPromiseAll} from "shared/utils"
 import { Translation} from "app/services"
-import {PreferenceState, Store as AppStore} from "app/app-model"
+import { PreferenceState, Store as AppStore } from "../local-model"
+import LoadingComponent from '../components/loading.vue'
 
 
 const PRELOAD_RANGE_THRESHOLD = 10
@@ -62,10 +68,14 @@ const PRELOAD_RANGE = 20
 
 export default createComponent({
   name: 'reader',
+  components: {
+    LoadingComponent
+  },
   setup(props, context) {
-    let isTextEditorOpened = ref(true)
+    let isTextEditorOpened = ref(false)
     let isSupportBrowserSpeaking = ref(false)
     const translator = new Translation()
+    const router = context.root.$router as Router
 
     if ('speechSynthesis' in window) {
       isSupportBrowserSpeaking.value = true
@@ -81,6 +91,7 @@ export default createComponent({
     const indicator = computed<number>(() => store.getters['reader/indicator'])
     const translatedTexts = computed<string[]>(() => store.getters['reader/translatedTexts'])
     const untranslatedTexts = computed<string[]>(() => store.getters['reader/untranslatedTexts'])
+    const isLoading = computed<boolean>(() => !translatedTexts.value[indicator.value])
     const preference = computed<PreferenceState>(() => store.state.preference)
     const maxIndicator = computed(() => Math.max(textSizes.value - 1, 0))
     const minIndicator = ref(0)
@@ -151,8 +162,14 @@ export default createComponent({
     const handleTextareaToggle = () => {
       isTextEditorOpened.value = !isTextEditorOpened.value
     }
+    const handleGoBack = () => {
+      router.go(-1)
+    }
 
     return {
+      isLoading,
+      isReady,
+
       nextIndicator,
       prevIndicator,
       gotoIndicator,
@@ -169,7 +186,8 @@ export default createComponent({
       translatedTexts,
 
       handleTextInput,
-      handleTextareaToggle
+      handleTextareaToggle,
+      handleGoBack
     }
   }
 })

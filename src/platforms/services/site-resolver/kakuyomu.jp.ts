@@ -4,6 +4,7 @@ import {FileCache} from '../controllers'
 import {FILE_CACHE_ALIVE_TIME} from './constants'
 import {NovelServices} from "novel-model"
 import Request from "./request"
+import * as MD5 from 'md5'
 
 export class KakuyomuJpResolver implements NovelServices.RuleResolver {
   public readonly domain = 'kakuyomu.jp'
@@ -46,7 +47,7 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
     //
     
     // Fetch
-    const response = await Request.get(novelHomePage, {}, { proxy: true})
+    const response = await Request.get(novelHomePage, {})
     if (response.status !== 200) {
       throw new Error('Request fail')
     }
@@ -79,6 +80,7 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
   
     const meta: NovelServices.Meta = {
       title,
+      id: MD5(novelHomePage),
       authors: [$('#workAuthor-activityName').text()],
       description: $('#introduction').text(),
       publishers: [ this.domain ],
@@ -103,7 +105,7 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
     if (cachedMeta) return cachedMeta
     
     const novelFrontMatterURL = `http://${this.domain}/works/${novelId}/episodes/${chapterId}`
-    const {data} = await Axios.get(novelFrontMatterURL)
+    const {data} = await Request.get(novelFrontMatterURL, {})
     const $ = Cheerio.load(data, {decodeEntities: false})
     const content = $('.widget-episode-inner').text()
     await FileCache.set(this.getCachePath(novelId, chapterId), content)

@@ -1,12 +1,12 @@
 import {Module, Plugin, Store} from "vuex"
 import {StorageNames, Store as AppStore} from "app/app-model"
 import {LocalStorage, SessionStorage} from "app/services"
-import {NovelAppService} from "novel-model"
+import {Services} from "app/app-model"
 import {debounce} from "shared/utils"
 
-const storageInstances: { [key: string]: NovelAppService.SessionStorage | NovelAppService.LocalStorage } = {}
+const storageInstances: { [key: string]: Services.SessionStorage | Services.LocalStorage } = {}
 
-function getStorageHandler(moduleName, storageEngine): NovelAppService.SessionStorage | NovelAppService.LocalStorage {
+function getStorageHandler(moduleName, storageEngine): Services.SessionStorage | Services.LocalStorage {
   const instanceKey = StorageNames.persistence + '-' + moduleName
   if (!storageInstances[instanceKey]) {
     const Engine = storageEngine === 'sessionStorage' ? SessionStorage : LocalStorage
