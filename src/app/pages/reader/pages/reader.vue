@@ -48,7 +48,7 @@
     <button class="uk-button uk-button-default uk-button-large uk-width-1-1" @click="handleGoBack">
       < Back
     </button>
-    <LoadingComponent v-if="!isReady || isLoading"></LoadingComponent>
+<!--    <LoadingComponent v-if="!isReady || isLoading"></LoadingComponent>-->
   </div>
 </template>
 
@@ -124,7 +124,7 @@ export default createComponent({
       }
     }
     const audio = async (indicator: number) => {
-      const text = untranslatedTexts[indicator]
+      const text = untranslatedTexts.value[indicator]
       if (!text) return
       if (preference.value.speakingEngine === 'baidu' || !isSupportBrowserSpeaking) {
         const url = await translator.audio(text)
@@ -150,11 +150,12 @@ export default createComponent({
       store.commit('reader/indicator', Number(toIndicator))
     }
 
-    watch(() => isReady.value || indicator.value || fullText.value , () => {
+    watch([() => isReady.value, () => fullText.value, () => indicator.value] , () => {
       if (isReady.value) {
-        return translate(indicator.value, preference.value.translationEngine)
-      }
-    })
+      return translate(indicator.value, preference.value.translationEngine)
+    }
+  })
+
 
     const handleTextInput = text => {
       store.commit('reader/fullText', text)
