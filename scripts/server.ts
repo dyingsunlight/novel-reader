@@ -1,7 +1,7 @@
 const Bundler = require('parcel-bundler');
 const path = require('path');
-const fs = require('fs')
 const express = require('express');
+import loadEntries from './utils/entries'
 
 
 const app = new express()
@@ -18,31 +18,7 @@ const options = {
 // https://en.parceljs.org/api.html
 ;(async function() {
   
-  const entries = fs
-    .readdirSync(sourcePath)
-    .reduce((prev, name) => {
-      
-      const sourceScriptPath = path.resolve(sourcePath, name, 'index.ts')
-      if (!fs.existsSync(sourceScriptPath) || !fs.statSync(sourceScriptPath).isFile() ) {
-        return prev
-      }
-      
-      const indexTemplateFilename = path.resolve(sourcePath, name, 'index')
-      const sourceTemplateFilename = path.resolve(sourcePath, name, 'template')
-      const templatePath = [
-        ...(['.hbs', '.handlebar', '.pug', '.html'].map(suffix => indexTemplateFilename + suffix)),
-        ...(['.hbs', '.handlebar', '.pug', '.html'].map(suffix => sourceTemplateFilename + suffix)),
-      ].find(fs.existsSync)
-      
-      if (!templatePath) {
-        throw new Error('Template not found for ' + sourceScriptPath)
-      }
-      
-      prev.push(templatePath)
-      
-      return prev
-    }, [])
-  
+  const entries = loadEntries(sourcePath)
   console.group('Development server is listening at:')
   entries.forEach(entry => {
     console.log(`http://localhost:${port}${entry.slice(sourcePath.length)}`)

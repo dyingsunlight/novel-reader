@@ -11,3 +11,12 @@ export class FileCache {
   @Column({ type: 'datetime' })
   created: Date
 }
+
+@Entity()
+export class Translation {
+  @PrimaryColumn()
+  hash: string
+  
+  @Column()
+  text: string
+}

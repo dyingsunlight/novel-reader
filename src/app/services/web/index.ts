@@ -2,7 +2,7 @@ import { SessionStorage, LocalStorage } from "./storage"
 import { Translation } from './translation'
 import Resolver from './resolver'
 
-export default {
+export {
   Translation,
   SessionStorage,
   LocalStorage,

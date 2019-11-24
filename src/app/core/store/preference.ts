@@ -44,11 +44,15 @@ export default <Module<PreferenceState, null>>{
   },
   mutations: {
     update(state: PreferenceState, payload: PreferenceState) {
+      if (!payload) return
+      
       const isSupportBrowserSpeaking = 'speechSynthesis' in window
       
       if (!isSupportBrowserSpeaking) {
-        payload.speakingEngines = payload.speakingEngines.slice(0).filter(engine => engine !== 'browser')
-        payload.speakingEngine = payload.speakingEngines[0] || 'google'
+        if (payload.speakingEngines) {
+          payload.speakingEngines = payload.speakingEngines.slice(0).filter(engine => engine !== 'browser')
+          payload.speakingEngine = payload.speakingEngines[0] || 'google'
+        }
       }
       
       const keys: (keyof PreferenceState)[]= [

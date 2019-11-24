@@ -56,8 +56,11 @@ export default <Module<Collection, null>>{
       state.finishedJobs.push(name)
     },
     restoreLocalStorage(state, payload: Collection) {
+      console.log('restoreLocalStorage collection, payload', payload)
       if (!payload) return
-      Vue.set(state, 'items', payload.items)
+      if (payload.items) {
+        Vue.set(state, 'items', payload.items)
+      }
     }
   },
   actions: {

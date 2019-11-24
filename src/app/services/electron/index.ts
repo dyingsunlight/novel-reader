@@ -1,5 +1,10 @@
-// import {PlatformService} from "../../../interfaces/platform-service"
+import { SessionStorage, LocalStorage } from "./storage"
+import { Translation } from './translation'
+import Resolver from './resolver'
 
-// export class ElectronService implements PlatformService {
-//
-// }
+export {
+  Translation,
+  SessionStorage,
+  LocalStorage,
+  Resolver
+}

@@ -48,7 +48,8 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
     
     // Fetch
     const response = await Request.get(novelHomePage, {})
-    if (response.status !== 200) {
+    if (!response || response.status !== 200) {
+      console.error(response)
       throw new Error('Request fail')
     }
     //
@@ -106,8 +107,14 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
     if (cachedMeta) return cachedMeta
     
     const novelFrontMatterURL = `http://${this.domain}/works/${novelId}/episodes/${chapterId}`
-    const {data} = await Request.get(novelFrontMatterURL, {})
-    const $ = Cheerio.load(data, {decodeEntities: false})
+    
+    const response = await Request.get(novelFrontMatterURL, {})
+    if (!response || response.status !== 200) {
+      console.error(response)
+      throw new Error('Request fail')
+    }
+    
+    const $ = Cheerio.load(response.data, {decodeEntities: false})
     const content = $('.widget-episode-inner').text()
     await FileCache.set(this.getCachePath(novelId, chapterId), content)
     return content

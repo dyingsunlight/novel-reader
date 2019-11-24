@@ -1,5 +1,5 @@
 import {Connection, createConnection} from 'typeorm'
-import {FileCache} from "./entities"
+import {FileCache, Translation} from "./entities"
 import {PATH} from "platforms/constants"
 import * as Path from "path"
 
@@ -16,7 +16,8 @@ class Database {
   async initialize(options) {
     const databaseType = options.tpye || 'sqlite'
     const entities = [
-      FileCache
+      FileCache,
+      Translation
     ]
     switch (databaseType) {
       case 'mysql':
@@ -107,6 +108,21 @@ class Database {
         created: item.created
       }
     }
+  }
+  
+  async findTranslationCache(hash: string): Promise<string|void> {
+    await this.waitUntilInitialized()
+    const item = await this.connection.getRepository(Translation).findOne({hash})
+    if (item) return item.text
+  }
+  
+  async createTransltionCache(hash, text) {
+    await this.waitUntilInitialized()
+    const item = new Translation()
+    item.hash = hash
+    item.text = text
+    const responsibility = this.connection.getRepository(Translation)
+    await responsibility.save(item)
   }
 }
 

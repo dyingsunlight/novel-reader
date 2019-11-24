@@ -46,7 +46,8 @@ export class SyosetuResolver implements NovelServices.RuleResolver {
     
     // Fetch
     const response = await Request.get(novelHomePage, {})
-    if (response.status !== 200) {
+    if (!response || response.status !== 200) {
+      console.error(response)
       throw new Error('Request fail')
     }
     //
@@ -102,8 +103,13 @@ export class SyosetuResolver implements NovelServices.RuleResolver {
     if (cachedMeta) return cachedMeta
   
     const novelPageURL = `http://ncode.syosetu.com/${novelId}/${chapterId}/`
-    const {data} = await Request.get(novelPageURL, {})
-    const $ = Cheerio.load(data, {decodeEntities: false})
+    
+    const response = await Request.get(novelPageURL, {})
+    if (!response || response.status !== 200) {
+      throw new Error('Request fail')
+    }
+  
+    const $ = Cheerio.load(response.data, {decodeEntities: false})
     const content = $('#novel_honbun').text()
     await FileCache.set(this.getCachePath(novelId, chapterId), content)
     return content

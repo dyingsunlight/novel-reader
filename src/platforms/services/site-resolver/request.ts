@@ -9,9 +9,7 @@ const proxyConfig = {
   username: process.env['PLATFORMS_SERVICE_PROXY_USERNAME'] || '',
   password: process.env['PLATFORMS_SERVICE_PROXY_PASSWORD'] || '',
 }
-/**
- 
- **/
+
 const getConfig = (config, {proxy = false}) => {
   
   const hadSetAuthentication = proxyConfig.username && proxyConfig.password
@@ -42,31 +40,39 @@ const getConfig = (config, {proxy = false}) => {
 
 export default {
   async get(url, config = {}, options = {}) {
+    const usingConfig = getConfig(config, {proxy: usingProxy})
     try {
-      return await Axios.get(url, getConfig(config, {proxy: usingProxy}))
+      return await Axios.get(url, usingConfig)
     } catch (e) {
-      return e.response
+      console.error(e, usingConfig)
+      return
     }
   },
   async post(url, body?, config?, options = {}) {
+    const usingConfig = getConfig(config, {proxy: usingProxy})
     try {
-      return await Axios.post(url, body, getConfig(config, {proxy: usingProxy}))
+      return await Axios.post(url, body, usingConfig)
     } catch (e) {
-      return e.response
+      console.error(e, usingConfig)
+      return
     }
   },
   async put(url, body?, config?, options = {}) {
+    const usingConfig = getConfig(config, {proxy: usingProxy})
     try {
-      return await Axios.put(url, body, getConfig(config, {proxy: usingProxy}))
+      return await Axios.put(url, body, usingConfig)
     } catch (e) {
-      return e.response
+      console.error(e, usingConfig)
+      return
     }
   },
   async delete(url, config?, options = {}) {
+    const usingConfig = getConfig(config, {proxy: usingProxy})
     try {
-      return await Axios.delete(url, getConfig(config, {proxy: usingProxy}))
+      return await Axios.delete(url, usingConfig)
     } catch (e) {
-      return e.response
+      console.error(e, usingConfig)
+      return
     }
   }
 }
