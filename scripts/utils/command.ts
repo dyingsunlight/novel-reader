@@ -8,7 +8,7 @@ export const commandPromise = function (command, args, options) {
       env: {
         "PATH": process.env["PATH"],
       },
-      customFds: [0,1,2],
+      // customFds: [0,1,2],
       shell: false,
       detached: false,
       ...(options || {})

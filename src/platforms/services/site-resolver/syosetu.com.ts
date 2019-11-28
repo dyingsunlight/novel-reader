@@ -57,6 +57,8 @@ export class SyosetuResolver implements NovelServices.RuleResolver {
     const title = $('#novel_color .novel_title').text()
     const contents: NovelServices.ContentsItem[] = []
     let lastContent: NovelServices.ContentsItem
+    let isLastContentSaved = false
+  
     $('#novel_color .index_box > *').each(function () {
       const $el = $(this)
       let item: NovelServices.ContentsItem = {
@@ -68,15 +70,28 @@ export class SyosetuResolver implements NovelServices.RuleResolver {
         item.children = []
         lastContent = item
         contents.push(item)
-      } else if (lastContent) {
+        isLastContentSaved = true
+      } else {
+        if (!lastContent) {
+          lastContent = {
+            url: null,
+            title: 'No Category',
+            children: []
+          }
+        }
         item.title = $el.find('.subtitle').text()
         item.updated = $el.find('.long_update > span[title]').attr('title')
         item.created = $el.find('.long_update ').text()
         item.url = 'https://ncode.syosetu.com' + $el.find('.subtitle a').attr('href')
         lastContent.children.push(item)
+        isLastContentSaved = false
       }
     })
     
+    if (!isLastContentSaved && lastContent) {
+      contents.push(lastContent)
+    }
+  
     const meta: NovelServices.Meta = {
       title,
       id: MD5(novelHomePage),

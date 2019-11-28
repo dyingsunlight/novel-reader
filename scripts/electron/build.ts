@@ -8,7 +8,11 @@ import { npm } from '../utils/command'
   const projectRoot = path.resolve(__dirname, '../../')
   const baseBuildingDir = path.resolve(projectRoot, 'dist/electron')
   console.log(`Build Info: \nBase Directory: ${baseBuildingDir} \nCurrent Project Root: ${baseBuildingDir}`)
-
+  //
+  //
+  console.info('Compiling Base NPM Distribution ....')
+  await npm(['run', 'build:platforms'], {cwd: projectRoot})
+  await npm(['run', 'build:electron-app'], {cwd: projectRoot})
   await fs.ensureDir(baseBuildingDir)
   fs.copySync(path.resolve(projectRoot, 'dist/host'), baseBuildingDir)
   fs.copyFileSync(path.resolve(__dirname, 'package.json'), path.resolve(baseBuildingDir, 'package.json'))
@@ -18,18 +22,14 @@ import { npm } from '../utils/command'
   fs.copyFileSync(path.resolve(projectRoot, 'src/platforms/electron/production.env.json'), path.resolve(baseBuildingDir, 'production.env.json'))
   console.info('Copying assets .... Done.')
   //
-  //
-  console.info('Compiling Base NPM Distribution ....')
-  await npm(['run', 'build:platforms'], {cwd: projectRoot})
-  await npm(['run', 'build:electron-app'], {cwd: projectRoot})
-  //
   // Building
   await npm(['install', '--only=prod'], {cwd: baseBuildingDir})
   console.log('Start Electron Packager ... ')
   await Packager({
     dir: baseBuildingDir,
-    platform: 'win32',
+    platform: 'darwin',
     asar: true,
+    osxSign: false,
     out: path.resolve(projectRoot, `dist/electron-release/${new Date().getTime()}`)
   })
   console.log('Start Electron Packager ... Done.')

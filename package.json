@@ -3,17 +3,16 @@
   "version": "1.0.0",
   "scripts": {
     "postinstall": "electron-rebuild sqlite3",
-    "start:app": "ts-node ./scripts/server.ts",
-    "start:web-app": "cross-env WEB_BACKEND_HOST=http://127.0.0.1:10009 DEVELOPMENT_PORT=10007 TARGET_PLATFORM=web npm run start:app",
-    "web-backend-server": "cross-env PLATFORMS_SERVICE_PROXY_ENABLE=true WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node --project ./src/tsconfig-platforms.json -r tsconfig-paths/register ./src/platforms/web/server.ts",
+    "dev:app": "ts-node ./scripts/server.ts",
+    "dev:web-app": "cross-env WEB_BACKEND_HOST=http://127.0.0.1:10009 DEVELOPMENT_PORT=10007 TARGET_PLATFORM=web npm run dev:app",
+    "dev:web-server": "cross-env PLATFORMS_SERVICE_PROXY_ENABLE=true WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node --project ./src/tsconfig-platforms.json -r tsconfig-paths/register ./src/platforms/web/server.ts",
     "build:platforms": "tsc -p ./src/tsconfig-platforms.json --outDir dist/host && tscpaths -p src/tsconfig-platforms --src src -o dist/host",
-    "build:web-app": "parcel build src/app/pages/**/*.html -d dist/host/platforms/web/app --public-url=./ --no-source-maps",
-    "build:electron-app": "cross-env TARGET_PLATFORM=electron parcel build src/app/pages/**/*.html -d dist/host/platforms/electron/app --public-url=./ --no-source-maps",
+    "build:web-app": "ts-node ./scripts/build.ts --target=web --out-dir=./dist/host/platforms/web/app",
+    "build:electron-app": "ts-node ./scripts/build.ts --target=web --out-dir=./dist/host/platforms/electron/app",
     "build:electron-distribution": "ts-node ./scripts/electron/build.ts",
-    "start:elecron-app": "cross-env DEVELOPMENT_PORT=10012 TARGET_PLATFORM=electron npm run start:app",
-    "start:electon-main": "ts-node ./scripts/electron/dev.ts",
-    "start:electon-main-auto": "ts-node ./scripts/electron/dev.ts --auto-reload=true",
-    "start:build-test": "ts-node ./scripts/build.ts --target=electron ---prefix=@election"
+    "dev:elecron-app": "cross-env DEVELOPMENT_PORT=10012 TARGET_PLATFORM=electron npm run dev:app",
+    "dev:electon-main": "ts-node ./scripts/electron/dev.ts",
+    "dev:electon-main-auto": "ts-node ./scripts/electron/dev.ts --auto-reload=true"
   },
   "dependencies": {
     "@vue/composition-api": "^0.3.2",

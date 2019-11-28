@@ -59,6 +59,7 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
     const title = $('#workTitle').text()
     const contents: NovelServices.ContentsItem[] = []
     let lastContent: NovelServices.ContentsItem
+    let isLastContentSaved = false
     const resolver = this
     $('#table-of-contents ol.widget-toc-items > li').each(function () {
       const $el = $(this)
@@ -71,13 +72,26 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
         item.children = []
         lastContent = item
         contents.push(item)
-      } else if (lastContent) {
+        isLastContentSaved = true
+      } else {
+        if (!lastContent) {
+          lastContent = {
+            url: null,
+            title: 'No Category',
+            children: []
+          }
+        }
         item.title = $el.find('span.widget-toc-episode-titleLabel').text()
         item.created = $el.find('time.widget-toc-episode-datePublished').attr('datetime')
         item.url = resolver.domain + $el.find('> a').attr('href')
         lastContent.children.push(item)
+        isLastContentSaved = false
       }
     })
+    
+    if (!isLastContentSaved && lastContent) {
+      contents.push(lastContent)
+    }
   
     const meta: NovelServices.Meta = {
       title,

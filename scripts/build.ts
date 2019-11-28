@@ -7,12 +7,9 @@ const sourcePath = path.resolve(__dirname, '../src/app/pages')
 
 const options = {
   sourceMaps: false,
-  productionL: true,
-  outDir: './dist/buid-test',
+  production: true,
+  outDir: './dist/app',
   publicUrl: './',
-  logLevel: 3,
-  minify: true,
-  hmr: false
 }
 
 const parcelBuild = async function (entries, options) {
@@ -30,10 +27,24 @@ const parcelBuild = async function (entries, options) {
 
 (async function () {
   const args = normalizeArgument(process.argv)
-  const target = args.target || 'all'
-  const entries = loadEntries(sourcePath)
+  const target = args.target || process.env['TARGET_PLATFORM'] ||'all'
+  const entries = loadEntries(sourcePath, (folderName) => {
+    const segments = folderName.split('@')
+    const name = segments[0]
+    const suffix = segments[1] || ''
+    if (target!== 'all' && suffix && suffix.toLowerCase() !== target) {
+      return
+    }
+    return name
+  })
+  options.outDir = args['out-dir'] || args['outDir'] || options.outDir
   console.log('Development server is listening at:')
-  console.info('Building file detected:\n\n', entries.map(path => '    ' + path).join(('\n')))
-  console.log('\n\n')
-  await parcelBuild(entries, options)
+  console.info('Building file detected:\n\n', entries.map(path => `- in: ${path.in}\n-out: ${path.out}\n\n`).join(('\n')))
+  console.log('Current Target: ', target)
+  
+  for (let p of entries) {
+    await parcelBuild(p.in, Object.assign({}, options, {outDir: path.join(options.outDir, p.out)}))
+  }
+  
+  process.exit(0)
 })()
