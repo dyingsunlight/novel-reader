@@ -9,8 +9,20 @@
   <div class="uk-height-1-1 uk-margin-small-top">
     <div v-for="collection in collections">
       <ul class="uk-margin-remove uk-padding-remove">
-        <li class="uk-flex uk-flex-middle uk-position-relative uk-flex-between" style="margin-bottom: 40px">
-          <span class="collection-title uk-button uk-button-link uk-text-left" @click="handleGotoNovelFrontCover(collection.id)"> {{ collection.title }} </span>
+        <li class="uk-flex uk-flex-middle uk-position-relative uk-flex-between"
+            style="margin-bottom: 40px">
+          <div class="uk-flex uk-width-1-1 uk-flex-between uk-flex-middle">
+            <span class="collection-title uk-button uk-button-link uk-text-left" @click="handleGotoNovelFrontCover(collection.id)"> {{ collection.title }} </span>
+            <button class="uk-button uk-button-default uk-margin-small-left" type="button" style="flex-shrink: 0;align-self: center">
+              More
+            </button>
+            <div uk-dropdown="pos: bottom-center;mode: click; animation: uk-animation-slide-top-small; duration: 75">
+              <ul class="uk-nav uk-dropdown-nav">
+                <li><a href="#" @click="handleRemoveCollection(collection)">Delete</a></li>
+              </ul>
+            </div>
+
+          </div>
           <span class="collection-introduction uk-text-small uk-text-muted">
             <span>
               {{ collection.authors.join('/') }} / {{ collection.publishers.join('/') }}
@@ -40,13 +52,12 @@
             <input class="uk-input" id="form-stacked-text" type="text" placeholder="" :disabled="isFetchingContent" v-model="url" autofocus>
           </div>
         </div>
-
         <p class="uk-text-right">
           <button class="uk-button uk-button-default" :disabled="isFetchingContent" @click="handleCloseCollectionModal">
             Close
           </button>
           <button class="uk-button uk-button-primary" :disabled="isFetchingContent" @click="fetchContent">
-            Fetch
+            {{ isFetchingContent ? 'Fetching ... ' : 'Fetch'}}
           </button>
         </p>
       </div>
@@ -60,9 +71,7 @@
 <style scoped>
 
 .collection {
-  height: 100vh;
-  overflow: auto;
-  min-height: 500px;
+  min-height: 100vh;
 }
 
 .collection .collection-bottom-bar {
@@ -155,6 +164,14 @@ export default createComponent({
       return router.push({path: '/front-cover', query: { id }})
     }
 
+    const handleRemoveCollection = async (collection: Services.ResolvedMeta) => {
+      let isConfirmed = confirm(`Remove this collection ? \n\n ${collection.title} \n\n`)
+      if (!isConfirmed) {
+        return
+      }
+      store.commit('collection/remove', collection.id)
+    }
+
     return {
       collections,
       url,
@@ -168,7 +185,9 @@ export default createComponent({
       handleCloseCatalogModal,
       handleOpenCatalogModal,
       handleCatalogPreviewClick,
-      handleGotoNovelFrontCover
+      handleGotoNovelFrontCover,
+
+      handleRemoveCollection
     }
   },
 })

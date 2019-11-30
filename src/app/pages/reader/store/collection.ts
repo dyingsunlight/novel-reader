@@ -26,7 +26,7 @@ export default <Module<Collection, null>>{
   mutations: {
     remove(state, id: string) {
       const findIndex = state.items.findIndex(item => item.id === id)
-      if (findIndex === -1) {
+      if (findIndex !== -1) {
         state.items.splice(findIndex)
       }
     },
