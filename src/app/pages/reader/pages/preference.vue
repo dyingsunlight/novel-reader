@@ -1,6 +1,5 @@
 <template>
   <div class="uk-section">
-    <button @click="handleGoBack" class="uk-button uk-button-default uk-width-1-1"> < Back </button>
 
     <div class="uk-margin-top">
       <p class="uk-text-muted uk-margin-small-bottom"> Translation Engine </p>
@@ -38,13 +37,19 @@
         </div>
       </template>
     </div>
+
+    <div class="uk-margin-top">
+      <button class="uk-button uk-button-primary uk-width-1-1" @click="applyChanges" :disabled="!isDirty"> Apply </button>
+      <button @click="handleGoBack" class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top"> < Back </button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import { isEqual } from 'lodash'
 import { Store } from 'vuex'
 import Router from 'vue-router'
-import { createComponent, ref, watch } from '@vue/composition-api'
+import { createComponent, ref, watch, computed } from '@vue/composition-api'
 import { PreferenceState, Store as AppStore } from "../local-model"
 
 export default createComponent({
@@ -53,15 +58,17 @@ export default createComponent({
     const store = context.root.$store as Store<AppStore>
     const router = context.root.$router as Router
 
-    let preference = ref<PreferenceState>({})
+    const preference = ref<PreferenceState>({})
+    const preferenceSnapshot = computed(() => store.getters['preference/snapshot'])
+    const isDirty = computed(() => !isEqual(preferenceSnapshot.value, preference.value))
 
     watch(() => store.getters['preference/snapshot'], (newValue) => {
       preference.value = newValue
     })
 
-    watch(() => store.getters['preference/isReady'], isReady => {
+    watch(() => preferenceSnapshot.value, isReady => {
       if (isReady) {
-        preference = JSON.parse(JSON.stringify(store.getters['preference/snapshot']))
+        preference.value = JSON.parse(JSON.stringify(preferenceSnapshot.value))
       }
     }, { deep: true })
 
@@ -69,8 +76,16 @@ export default createComponent({
       router.go(-1)
     }
 
+    const applyChanges = () => {
+      if (!isEqual(preferenceSnapshot, preference.value)) {
+        store.commit('preference/update', preference.value)
+      }
+    }
+
     return {
       preference,
+      applyChanges,
+      isDirty,
       handleGoBack
     }
   },

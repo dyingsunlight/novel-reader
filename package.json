@@ -8,13 +8,14 @@
     "dev:web-server": "cross-env PLATFORMS_SERVICE_PROXY_ENABLE=true WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node --project ./src/tsconfig-platforms.json -r tsconfig-paths/register ./src/platforms/web/server.ts",
     "build:platforms": "tsc -p ./src/tsconfig-platforms.json --outDir dist/host && tscpaths -p src/tsconfig-platforms --src src -o dist/host",
     "build:web-app": "ts-node ./scripts/build.ts --target=web --out-dir=./dist/host/platforms/web/app",
-    "build:electron-app": "ts-node ./scripts/build.ts --target=web --out-dir=./dist/host/platforms/electron/app",
+    "build:electron-app": "cross-env TARGET_PLATFORM=electron ts-node ./scripts/build.ts --target=electron --out-dir=./dist/host/platforms/electron/app",
     "build:electron-distribution": "ts-node ./scripts/electron/build.ts",
     "dev:elecron-app": "cross-env DEVELOPMENT_PORT=10012 TARGET_PLATFORM=electron npm run dev:app",
     "dev:electon-main": "ts-node ./scripts/electron/dev.ts",
     "dev:electon-main-auto": "ts-node ./scripts/electron/dev.ts --auto-reload=true"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.149",
     "@vue/composition-api": "^0.3.2",
     "axios": "^0.19.0",
     "body-parser": "^1.19.0",
@@ -25,6 +26,7 @@
     "express-http-proxy": "^1.6.0",
     "fs-extra": "^8.1.0",
     "js-base64": "^2.5.1",
+    "lodash": "^4.17.15",
     "md5": "^2.2.1",
     "minio": "^7.0.12",
     "reflect-metadata": "^0.1.13",

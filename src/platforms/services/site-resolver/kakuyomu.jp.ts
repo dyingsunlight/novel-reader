@@ -49,7 +49,6 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
     // Fetch
     const response = await Request.get(novelHomePage, {})
     if (!response || response.status !== 200) {
-      console.error(response)
       throw new Error('Request fail')
     }
     //
@@ -112,7 +111,6 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
   }
   
   async getChapter(url: string) {
-    console.log('url', url)
     if (!this.test(url)) return
     const {novelId, chapterId} = this.parseURL(url)
     if (!novelId || !chapterId) return

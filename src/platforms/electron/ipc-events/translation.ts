@@ -1,4 +1,4 @@
-import { MainIPC } from '../library/ipc'
+import { MainIPC } from '../core/ipc'
 import { translator } from 'platforms/services'
 
 export const setup = function(ipc: MainIPC) {

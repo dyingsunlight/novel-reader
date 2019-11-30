@@ -90,7 +90,12 @@ export default createComponent({
 
     const handleOpenReader = async (url: string) => {
       isLoading.value = true
-      const content = await resolver.getChapter(url)
+      let content
+      try {
+        content = await resolver.getChapter(url)
+      } catch (e) {
+        UIkit.modal.alert('Network error, Check your network connection or setup up a proxy.')
+      }
       store.commit('reader/fullText', content)
       router.push({ path: '/reader'})
       isLoading.value = false

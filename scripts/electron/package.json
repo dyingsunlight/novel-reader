@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "platforms/electron/main.js",
   "dependencies": {
-    "@vue/composition-api": "^0.3.2",
+    "lodash": "^4.17.15",
     "axios": "^0.19.0",
     "cheerio": "^1.0.0-rc.3",
     "events": "^3.0.0",

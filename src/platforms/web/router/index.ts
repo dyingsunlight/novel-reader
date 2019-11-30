@@ -30,7 +30,6 @@ export default {
     
     app.get('/text/audio', async (req, res, next) => {
       const audioURL = req.query['url']
-      console.log('audioURL', audioURL)
       if (!audioURL) {
         res.sendStatus(400)
         return

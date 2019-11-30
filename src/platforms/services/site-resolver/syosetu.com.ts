@@ -47,7 +47,6 @@ export class SyosetuResolver implements NovelServices.RuleResolver {
     // Fetch
     const response = await Request.get(novelHomePage, {})
     if (!response || response.status !== 200) {
-      console.error(response)
       throw new Error('Request fail')
     }
     //

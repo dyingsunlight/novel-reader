@@ -114,6 +114,7 @@ export default createComponent({
         const novelMeta = await resolver.getMeta(url.value)
         store.commit('collection/add', novelMeta)
       }catch (e) {
+        UIkit.modal.alert('Network error, Check your network connection or setup up a proxy.')
         toggleCollectionModal(false)
       }
 

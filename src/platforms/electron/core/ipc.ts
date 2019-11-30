@@ -17,10 +17,11 @@ export class MainIPC {
       await new Promise(resolve => setTimeout(resolve))
       let replyData
       try {
-        // console.log('[Main IPC] received event ' + reply, data)
         replyData = await handler(data)
         sender.send(reply, { data: replyData })
       }catch (error) {
+        console.error(error)
+        sender.send(reply, { error })
         throw error
       }
     })

@@ -1,12 +1,16 @@
 import * as fs from "fs-extra"
 import * as path from "path"
+import normalizeArgument from "../utils/normalize-argv"
 
 interface FilePath {
   in: string
   out: string
 }
 
-export default function (sourcePath, normalizer ?: (name: string) => string) : FilePath[]{
+export default function (sourcePath) : FilePath[]{
+  const args = normalizeArgument(process.argv)
+  const target = (args.target || process.env['TARGET_PLATFORM'] ||'all').toLowerCase()
+
   return fs
     .readdirSync(sourcePath)
     .reduce((prev: FilePath[], name) => {
@@ -15,13 +19,12 @@ export default function (sourcePath, normalizer ?: (name: string) => string) : F
       if (!fs.statSync(folderPath).isDirectory()) {
         return prev
       }
-      
-      let folderName = name
-      if (normalizer) {
-        folderName = normalizer(folderName)
-        if (!folderName) {
-          return prev
-        }
+  
+      const segments = name.split('@')
+      const suffixTargetPlatform = segments[1] || ''
+      const isTargetPlatform = target === 'all' || !suffixTargetPlatform || suffixTargetPlatform.toLowerCase() === target
+      if (!isTargetPlatform) {
+        return prev
       }
       
       const sourceScriptPath = path.resolve(sourcePath, name, 'index.ts')
@@ -42,7 +45,7 @@ export default function (sourcePath, normalizer ?: (name: string) => string) : F
       
       prev.push({
         in: templatePath,
-        out: folderName
+        out: name
       })
       
       return prev

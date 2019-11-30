@@ -10,7 +10,6 @@ export default class Resolver implements Services.Resolver {
     })
   
     if (res.status !== 200) {
-      console.error(res)
       throw new Error("network error")
     }
     

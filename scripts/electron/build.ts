@@ -18,8 +18,8 @@ import { npm } from '../utils/command'
   fs.copyFileSync(path.resolve(__dirname, 'package.json'), path.resolve(baseBuildingDir, 'package.json'))
   fs.copyFileSync(path.resolve(projectRoot, '.npmrc'), path.resolve(baseBuildingDir, '.npmrc'))
   fs.copyFileSync(path.resolve(projectRoot, 'license.md'), path.resolve(baseBuildingDir, 'license.md'))
-  fs.copyFileSync(path.resolve(projectRoot, 'src/platforms/electron/development.env.json'), path.resolve(baseBuildingDir, 'development.env.json'))
-  fs.copyFileSync(path.resolve(projectRoot, 'src/platforms/electron/production.env.json'), path.resolve(baseBuildingDir, 'production.env.json'))
+  fs.copyFileSync(path.resolve(projectRoot, 'src/platforms/electron/development.env.json'), path.resolve(baseBuildingDir, 'platforms/electron/development.env.json'))
+  fs.copyFileSync(path.resolve(projectRoot, 'src/platforms/electron/production.env.json'), path.resolve(baseBuildingDir, 'platforms/electron/production.env.json'))
   console.info('Copying assets .... Done.')
   //
   // Building
@@ -27,7 +27,7 @@ import { npm } from '../utils/command'
   console.log('Start Electron Packager ... ')
   await Packager({
     dir: baseBuildingDir,
-    platform: 'darwin',
+    platform: 'win32',
     asar: true,
     osxSign: false,
     out: path.resolve(projectRoot, `dist/electron-release/${new Date().getTime()}`)

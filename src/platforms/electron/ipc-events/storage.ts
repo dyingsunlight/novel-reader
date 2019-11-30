@@ -1,5 +1,5 @@
 import Database from '../database'
-import { MainIPC } from '../library/ipc'
+import { MainIPC } from '../core/ipc'
 
 export const setup = function(ipc: MainIPC) {
   ipc.define('localStorage.setItem', async ({prefix, key, value}) => {
