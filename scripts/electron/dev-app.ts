@@ -1,4 +1,4 @@
-import { commandPromise } from '../utils/command'
+import { commandPromise, command } from '../utils/command'
 
 (async function f() {
   process.env['NODE_ENV'] = 'production'

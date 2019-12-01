@@ -5,11 +5,12 @@ import { debounce } from "./debounce"
 export const commandPromise = function (command, args, options?) {
   return new Promise(resolve => {
     const handler = spawn(command, args, {
+      stdio: 'pipe',
       cwd: path.resolve(__dirname, '../../'),
       env: {
         "PATH": process.env["PATH"],
       },
-      shell: false,
+      shell: true,
       detached: false,
       ...(options || {})
     })
@@ -43,7 +44,7 @@ export function command(command, args, options) {
     env: {
       "PATH": process.env["PATH"],
     },
-    shell: false,
+    shell: true,
     detached: false,
     ...(options || {})
   })

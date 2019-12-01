@@ -2,8 +2,6 @@ import {Menu} from 'electron'
 import CreateWindow from './window'
 const isMac = process.platform === 'darwin'
 
-
-
 export default function setupMenu(app, mainWindow) {
   const template = [
     // { role: 'appMenu' }
@@ -82,9 +80,9 @@ export default function setupMenu(app, mainWindow) {
             if (!mainWindow) throw new Error('Parent window not found')
             const win = await CreateWindow('preference@electron', {
               minWidth: 500,
-              minHeight: 500,
+              minHeight: 650,
               width: 500,
-              height: 600,
+              height: 650,
               parent: mainWindow,
               modal: true,
               resizable: false,
@@ -116,8 +114,9 @@ export default function setupMenu(app, mainWindow) {
         {
           label: 'Learn More',
           click: async () => {
-            const { shell } = require('electron')
-            await shell.openExternal('https://electronjs.org')
+            // const { shell } = require('electron')
+            // await shell.openExternal('https://electronjs.org')
+            throw new Error('Must throw error message')
           }
         }
       ]

@@ -10,6 +10,7 @@ import { setup as setupIPCEvents } from './ipc-events'
 import { MainIPC } from "./core/ipc"
 import CreateWindow from './core/window'
 import setupMenu from './core/menu'
+import { setup as setupErrorHandler} from './core/error'
 
 
 let mainWindow: BrowserWindow
@@ -18,14 +19,18 @@ const initializeMainWindow = async () => {
   mainWindow = CreateWindow('reader', {
     minWidth: 700,
     minHeight: 700,
+    width: 700,
+    height: 700,
   })
   setupMenu(app, mainWindow)
 }
+
 app.on('ready', initializeMainWindow)
 app.on('activate', initializeMainWindow)
 app.on('window-all-closed', function () {
   app.quit()
 })
 
+setupErrorHandler()
 setupIPCEvents(new MainIPC())
 

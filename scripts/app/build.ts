@@ -20,20 +20,33 @@ const parcelBuild = async function (entries, options) {
 
 (async function () {
   const args = normalizeArgument(process.argv)
-  const target = args.target || process.env['TARGET_PLATFORM'] ||'all'
+  const target = args.target
+  const outDir = args['out-dir'] || args['outDir']
   const entries = loadEntries(sourcePath)
+  
+  if (!target) {
+    throw new Error('Missing required \'--target\' parameter to build app.')
+  }
+  
+  if (!outDir) {
+    throw new Error('Missing required \'--out-dir\' parameter to build app.')
+  }
+  
+  Object.entries(args).forEach(([key, value]) => {
+    process.env[key] = value
+  })
   
   const options = {
     sourceMaps: false,
     production: true,
-    outDir: args['out-dir'] || args['outDir'],
+    outDir,
     cache: false,
     publicUrl: './',
   }
   
   console.log('Current Target: ', target)
   console.log('Development server is listening at:')
-  console.info('Building file detected:\n\n', entries.map(path => `\n- Entry: ${path.in}\n- Output: ${path.out}\n\n`).join(('\n')))
+  console.info('Building file detected:\n\n', entries.map(path => `\n- Entry: ${path.in}\n- Output: ${path.out}`).join(('\n')))
   for (let p of entries) {
     await parcelBuild(p.in, Object.assign({}, options, {outDir: path.join(options.outDir, p.out)}))
   }

@@ -63,6 +63,8 @@
 
     <div class="uk-margin-top">
       <button class="uk-button uk-button-primary uk-width-1-1" @click="applyChanges" :disabled="!isDirty"> Apply </button>
+      <button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top" @click="closeWindow"> Close </button>
+
     </div>
   </div>
 
@@ -122,9 +124,19 @@ export default createComponent({
       }
     }
 
+    const closeWindow = () => {
+      if (isDirty.value) {
+        if (!confirm('Deprecate current changed ?')) {
+          return
+        }
+      }
+      window.close()
+    }
+
     return {
       isDirty,
       applyChanges,
+      closeWindow,
       preference
     }
   },

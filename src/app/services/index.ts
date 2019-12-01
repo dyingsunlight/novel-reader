@@ -1,6 +1,8 @@
 let Services
 
-const targetPlatform = (process.env['TARGET_PLATFORM'] || 'web').trim().toLowerCase()
+const targetPlatform = (process.env['TARGET'] || 'web').trim().toLowerCase()
+
+console.log('RUNNING IN MODE: ', targetPlatform)
 
 if (targetPlatform === 'electron') {
   Services = require('./electron')
