@@ -11,15 +11,17 @@ import normalizeArgument from "../utils/normalize-argv"
   const args = normalizeArgument(process.argv)
   
   const projectRoot = path.resolve(__dirname, '../../')
-  const baseBuildingDir = path.resolve(projectRoot, 'dist/host/platforms/electron')
+  const baseBuildingDir = path.resolve(projectRoot, './.dev/electron/host/platforms/electron')
   
   await fs.ensureDir(baseBuildingDir)
   fs.copyFileSync(path.resolve(projectRoot, 'src/platforms/electron/development.env.json'), path.resolve(baseBuildingDir, 'development.env.json'))
   fs.copyFileSync(path.resolve(projectRoot, 'src/platforms/electron/production.env.json'), path.resolve(baseBuildingDir, 'production.env.json'))
-
-  await npm(['run', 'build:platforms'], {
-    cwd: projectRoot,
-  })
+  
+  const buildElectronHost = async () => {
+    await commandPromise('tsc', '-p src/tsconfig-platforms.json --outDir .dev/electron/host/'.split(' '))
+    await commandPromise('tscpaths', '-p src/tsconfig-platforms --src src -o .dev/electron/host'.split(' '))
+  }
+  await buildElectronHost()
   
   const watcher = Chokidar.watch('./platforms/**/*.ts', {
     cwd: path.resolve(projectRoot, 'src'),
@@ -35,9 +37,9 @@ import normalizeArgument from "../utils/normalize-argv"
         isChangedWhenCompiling = true
       }
       isRecompiling = true
-      await npm(['run', 'build:platforms'], {
-        cwd: projectRoot,
-      })
+  
+      await buildElectronHost()
+
       isRecompiling = false
       if (isChangedWhenCompiling) {
         isChangedWhenCompiling = false
@@ -47,7 +49,7 @@ import normalizeArgument from "../utils/normalize-argv"
       if (childProcess) {
         TreeKill(childProcess.pid)
       }
-      childProcess = command(Electron, ['./dist/host/platforms/electron/main.js'], {
+      childProcess = command(Electron, ['./.dev/electron/host/platforms/electron/main.js'], {
         cwd: projectRoot,
         env: {
           "PATH": process.env["PATH"],
@@ -61,8 +63,6 @@ import normalizeArgument from "../utils/normalize-argv"
     })
     debounceToRecompile()
   } else {
-    await npm(['run', 'build:platforms'], {
-      cwd: projectRoot,
-    })
+    await buildElectronHost()
   }
 })()

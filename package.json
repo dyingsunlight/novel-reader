@@ -3,16 +3,13 @@
   "version": "1.0.0",
   "scripts": {
     "postinstall": "electron-rebuild sqlite3",
-    "dev:app": "ts-node ./scripts/server.ts",
-    "dev:web-app": "cross-env WEB_BACKEND_HOST=http://127.0.0.1:10009 DEVELOPMENT_PORT=10007 TARGET_PLATFORM=web npm run dev:app",
-    "dev:web-server": "cross-env PLATFORMS_SERVICE_PROXY_ENABLE=true WEB_BACKEND_HOST=http://127.0.0.1:10009 ts-node --project ./src/tsconfig-platforms.json -r tsconfig-paths/register ./src/platforms/web/server.ts",
-    "build:platforms": "tsc -p ./src/tsconfig-platforms.json --outDir dist/host && tscpaths -p src/tsconfig-platforms --src src -o dist/host",
-    "build:web-app": "ts-node ./scripts/build.ts --target=web --out-dir=./dist/host/platforms/web/app",
-    "build:electron-app": "cross-env TARGET_PLATFORM=electron ts-node ./scripts/build.ts --target=electron --out-dir=./dist/host/platforms/electron/app",
-    "build:electron-distribution": "ts-node ./scripts/electron/build.ts",
-    "dev:elecron-app": "cross-env DEVELOPMENT_PORT=10012 TARGET_PLATFORM=electron npm run dev:app",
+    "dev:web-app": "ts-node ./scripts/web/dev-app.ts",
+    "dev:web-server": "ts-node ./scripts/web/dev.ts --auto-reload",
+    "build:web-distribution": "ts-node ./scripts/web/build.ts",
+    "dev:elecron-app": "ts-node ./scripts/electron/dev-app.ts",
     "dev:electon-main": "ts-node ./scripts/electron/dev.ts",
-    "dev:electon-main-auto": "ts-node ./scripts/electron/dev.ts --auto-reload=true"
+    "dev:electon-main-auto": "ts-node ./scripts/electron/dev.ts --auto-reload",
+    "build:electron-distribution": "ts-node ./scripts/electron/build.ts"
   },
   "dependencies": {
     "@types/lodash": "^4.14.149",

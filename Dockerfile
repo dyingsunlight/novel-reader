@@ -7,4 +7,4 @@ RUN apk add --no-cache --virtual .gyp \
             g++ \
         && npm install --only=prod --production --verbose \
         && apk del .gyp
-CMD [ "node", "./host/platforms/web/server.js" ]
+CMD [ "node", "./web/platforms/web/server.js" ]

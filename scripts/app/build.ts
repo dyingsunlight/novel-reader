@@ -1,16 +1,9 @@
 import * as Bundler from 'parcel-bundler'
 import * as path from 'path'
-import loadEntries from './utils/entries'
-import normalizeArgument from './utils/normalize-argv'
+import loadEntries from '../utils/entries'
+import normalizeArgument from '../utils/normalize-argv'
 
-const sourcePath = path.resolve(__dirname, '../src/app/pages')
-
-const options = {
-  sourceMaps: false,
-  production: true,
-  outDir: './dist/app',
-  publicUrl: './',
-}
+const sourcePath = path.resolve(__dirname, '../../src/app/pages')
 
 const parcelBuild = async function (entries, options) {
   return new Promise((resolve, reject) => {
@@ -29,7 +22,15 @@ const parcelBuild = async function (entries, options) {
   const args = normalizeArgument(process.argv)
   const target = args.target || process.env['TARGET_PLATFORM'] ||'all'
   const entries = loadEntries(sourcePath)
-  options.outDir = args['out-dir'] || args['outDir'] || options.outDir
+  
+  const options = {
+    sourceMaps: false,
+    production: true,
+    outDir: args['out-dir'] || args['outDir'],
+    cache: false,
+    publicUrl: './',
+  }
+  
   console.log('Current Target: ', target)
   console.log('Development server is listening at:')
   console.info('Building file detected:\n\n', entries.map(path => `\n- Entry: ${path.in}\n- Output: ${path.out}\n\n`).join(('\n')))

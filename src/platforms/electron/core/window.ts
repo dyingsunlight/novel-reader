@@ -16,7 +16,7 @@ export default function createWindow(name, windowOptions = {}): BrowserWindow {
   window.webContents.on('new-window', async (event, navigationUrl) => event.preventDefault())
   
   if (process.env.NODE_ENV === 'production') {
-    window.loadFile(path.resolve(__dirname, `./app/${name}/index.html`))
+    window.loadFile(path.resolve(__dirname, `../app/${name}/index.html`))
   } else {
     const port = process.env.DEVELOPMENT_PORT || 10007
     window.webContents.openDevTools()

@@ -11,7 +11,7 @@ jobs:
       services:
         - docker
       script:
-        - npm run build:platforms && npm run build:web-app
+        - npm run build:web-distribution
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker build -t $DOCKER_IMAGE_NAME -f Dockerfile .
         - docker push $DOCKER_IMAGE_NAME

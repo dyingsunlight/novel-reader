@@ -14,6 +14,7 @@ import setupMenu from './core/menu'
 
 let mainWindow: BrowserWindow
 const initializeMainWindow = async () => {
+  if (mainWindow) return
   mainWindow = CreateWindow('reader', {
     minWidth: 700,
     minHeight: 700,
