@@ -1,20 +1,22 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as Packager from 'electron-packager'
-import { npm } from '../utils/command'
+import { npm, commandPromise } from '../utils/command'
 
 (async function f() {
   process.env['NODE_ENV'] = 'production'
   const projectRoot = path.resolve(__dirname, '../../')
-  const baseBuildingDir = path.resolve(projectRoot, 'dist/electron')
+  const baseBuildingDir = path.resolve(projectRoot, './.build/electron')
   console.log(`Build Info: \nBase Directory: ${baseBuildingDir} \nCurrent Project Root: ${baseBuildingDir}`)
   //
   //
   console.info('Compiling Base NPM Distribution ....')
-  await npm(['run', 'build:platforms'], {cwd: projectRoot})
-  await npm(['run', 'build:electron-app'], {cwd: projectRoot})
   await fs.ensureDir(baseBuildingDir)
-  fs.copySync(path.resolve(projectRoot, 'dist/host'), baseBuildingDir)
+  
+  await commandPromise('tsc','-p ./src/tsconfig-platforms.json --outDir ./.build/electron'.split(' '))
+  await commandPromise('tscpaths','-p src/tsconfig-platforms --src src -o ./.build/electron'.split(' '))
+  await commandPromise('ts-node','./scripts/app/build.ts --target=electron --out-dir=./.build/electron/platforms/electron/app'.split(' '))
+
   fs.copyFileSync(path.resolve(__dirname, 'package.json'), path.resolve(baseBuildingDir, 'package.json'))
   fs.copyFileSync(path.resolve(projectRoot, '.npmrc'), path.resolve(baseBuildingDir, '.npmrc'))
   fs.copyFileSync(path.resolve(projectRoot, 'license.md'), path.resolve(baseBuildingDir, 'license.md'))
@@ -30,7 +32,7 @@ import { npm } from '../utils/command'
     platform: 'win32',
     asar: true,
     osxSign: false,
-    out: path.resolve(projectRoot, `dist/electron-release/${new Date().getTime()}`)
+    out: path.resolve(projectRoot, `dist/electron/${new Date().getTime()}`)
   })
   console.log('Start Electron Packager ... Done.')
 })()
