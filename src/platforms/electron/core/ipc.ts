@@ -1,4 +1,7 @@
 import {ipcMain, webContents} from "electron"
+import Logger from 'platforms/logger'
+
+const logger = new Logger('main-ipc')
 
 export class MainIPC {
   private events: {event: string, handler: Function}[] = []
@@ -20,7 +23,7 @@ export class MainIPC {
         replyData = await handler(data)
         sender.send(reply, { data: replyData })
       }catch (error) {
-        console.error(error)
+        logger.error(error)
         sender.send(reply, { error })
         throw error
       }

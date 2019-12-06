@@ -2,6 +2,9 @@ import { Connection, createConnection } from 'typeorm'
 import { Storage } from "./entities"
 import { PATH } from "platforms/constants"
 import * as Path from "path"
+import Logger from 'platforms/logger'
+
+const logger = new Logger('database')
 
 class DataBase {
   private connection: Connection = null
@@ -32,7 +35,7 @@ class DataBase {
         break
       default:
         const sqlitePath = Path.resolve(PATH.DATA, './electron.sqlite')
-        console.log('Sqlite Path is: ', sqlitePath)
+        logger.log('Sqlite Path is: ', sqlitePath)
         this.connection = await createConnection({
           type: "sqlite",
           entities,
@@ -49,7 +52,7 @@ class DataBase {
     let waitTime = 0
     
     while (!this.isInitialized && maxWaitTimes > waitTime++) {
-      console.log('Pending for database initialized')
+      logger.log('Pending for database initialized')
       await new Promise(resolve => setTimeout(resolve, 250))
     }
     

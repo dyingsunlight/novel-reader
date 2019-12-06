@@ -1,4 +1,6 @@
 import Axios from 'axios'
+import Logger from 'platforms/logger'
+const logger = new Logger('network')
 
 const getConfig = (config) => {
   const usingProxy =  !!process.env['PLATFORMS_SERVICE_PROXY_ENABLE']
@@ -43,7 +45,7 @@ export default {
     try {
       return await Axios.get(url, usingConfig)
     } catch (e) {
-      console.error(e, usingConfig)
+      logger.error(e, usingConfig)
       return
     }
   },
@@ -52,7 +54,7 @@ export default {
     try {
       return await Axios.post(url, body, usingConfig)
     } catch (e) {
-      console.error(e, usingConfig)
+      logger.error(e, usingConfig)
       return
     }
   },
@@ -61,7 +63,7 @@ export default {
     try {
       return await Axios.put(url, body, usingConfig)
     } catch (e) {
-      console.error(e, usingConfig)
+      logger.error(e, usingConfig)
       return
     }
   },
@@ -70,7 +72,7 @@ export default {
     try {
       return await Axios.delete(url, usingConfig)
     } catch (e) {
-      console.error(e, usingConfig)
+      logger.error(e, usingConfig)
       return
     }
   }

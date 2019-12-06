@@ -1,10 +1,7 @@
 // Modules to control application life and create native browser window
 import loadEnv from './core/env'
 import * as path from 'path'
-
-console.log('Using env file path', path.join(__dirname, process.env['ELECTRON_ENV_FILE'] || 'production.env.json'))
 loadEnv(path.join(__dirname, process.env['ELECTRON_ENV_FILE'] || 'production.env.json'))
-
 import { app, BrowserWindow } from 'electron'
 import { setup as setupIPCEvents } from './ipc-events'
 import { MainIPC } from "./core/ipc"

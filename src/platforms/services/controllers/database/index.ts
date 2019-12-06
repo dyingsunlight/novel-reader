@@ -2,6 +2,9 @@ import {Connection, createConnection} from 'typeorm'
 import {FileCache, Translation} from "./entities"
 import {PATH} from "platforms/constants"
 import * as Path from "path"
+import Logger from 'platforms/logger'
+
+const logger = new Logger('services-database')
 
 class Database {
   private connection: Connection = null
@@ -19,6 +22,8 @@ class Database {
       FileCache,
       Translation
     ]
+    logger.log('databaseType is ', databaseType)
+  
     switch (databaseType) {
       case 'mysql':
         this.connection = await createConnection({
@@ -32,17 +37,17 @@ class Database {
         })
         break
       default:
-        const sqlitePath = Path.resolve(PATH.DATA, options.sqlitePath || 'services.sqlite')
-        console.log('Services sqlite Path is: ', sqlitePath)
+        const sqlitePath = Path.resolve(PATH.DATA, 'services.sqlite')
+        logger.log('Services sqlite Path is: ', sqlitePath)
         this.connection = await createConnection({
           type: "sqlite",
           entities,
           database: sqlitePath
         })
     }
-    
+    logger.log('Wait for connection synchronize ...')
     await this.connection.synchronize()
-    
+    logger.log('Connection synchronize completed...')
   }
   
   async waitUntilInitialized() {
@@ -50,11 +55,11 @@ class Database {
     let waitTime = 0
     
     while (!this.isInitialized && maxWaitTimes > waitTime++) {
-      console.log('Pending for database initialized')
       await new Promise(resolve => setTimeout(resolve, 250))
     }
     
     if (!this.isInitialized) {
+      logger.error('Wait for database connection initialized timeout')
       throw new Error('Wait for database initialized timeout')
     }
   }

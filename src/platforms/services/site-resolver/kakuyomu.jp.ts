@@ -122,7 +122,6 @@ export class KakuyomuJpResolver implements NovelServices.RuleResolver {
     
     const response = await Request.get(novelFrontMatterURL, {})
     if (!response || response.status !== 200) {
-      console.error(response)
       throw new Error('Request fail')
     }
     

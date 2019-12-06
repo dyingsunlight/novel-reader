@@ -1,5 +1,8 @@
 import { Client } from 'minio'
 import {NovelServices} from "novel-model"
+import Logger from 'platforms/logger'
+
+const logger = new Logger('file-storage-minio')
 
 export default class MinioStorage implements NovelServices.Storage {
   private region = process.env['STORAGE_MINIO_REGION'] || 'us-west-1'
@@ -20,7 +23,7 @@ export default class MinioStorage implements NovelServices.Storage {
   
   constructor() {
     this.initialize().catch(e => {
-      console.error(e)
+      logger.error(e)
     })
   }
   
@@ -47,9 +50,9 @@ export default class MinioStorage implements NovelServices.Storage {
   private async createBucketIfNotExist() {
     const Buckets = await this.s3.listBuckets()
     if (Buckets.some(bucket => bucket.name === this.bucketName)) return
-    console.log(this.bucketName + ' was waiting to be created.')
+    logger.log(this.bucketName + ' was waiting to be created.')
     await this.s3.makeBucket(this.bucketName, this.region)
-    console.log(this.bucketName + ' was created')
+    logger.log(this.bucketName + ' was created')
   }
   
   async waitUntilInitialized() {
@@ -57,7 +60,7 @@ export default class MinioStorage implements NovelServices.Storage {
     let waitTime = 0
     
     while (!this.isAllReady && maxWaitTimes > waitTime++) {
-      console.log('Pending for database loaded')
+      logger.log('Pending for database loaded')
       await new Promise(resolve => setTimeout(resolve, 250))
     }
     

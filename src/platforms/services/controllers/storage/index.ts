@@ -6,7 +6,6 @@ let storage: NovelServices.Storage = null
 let type = process.env['STORAGE_TYPE']
 
 if (!type) {
-  console.warn('File Storage Mode not set, fallback using localFileStorage Mode')
   type = 'local'
 }
 

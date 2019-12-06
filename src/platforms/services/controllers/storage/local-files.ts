@@ -2,9 +2,12 @@ import * as fs from 'fs-extra'
 import * as path from 'path'
 import { PATH } from "platforms/constants"
 import {NovelServices} from "novel-model"
+import Logger from 'platforms/logger'
+
+const logger = new Logger('file-storage-local')
 
 export default class LocalFilesStorage implements NovelServices.Storage {
-  private root = path.resolve(PATH.DATA, process.env['STORAGE_LOCAL_PATH'] || './storage')
+  private root = path.resolve(PATH.DATA, './storage')
   
   constructor() {
     this.initialize()
@@ -22,7 +25,7 @@ export default class LocalFilesStorage implements NovelServices.Storage {
   }
   
   initialize() {
-    console.log('Initializing Local file storage mode ...')
+    logger.log('Initializing Local file storage mode ...')
     fs.ensureDirSync(this.root)
   }
   
@@ -46,7 +49,7 @@ export default class LocalFilesStorage implements NovelServices.Storage {
         resolve(filename)
       })
       dst.on('error', function (err) {
-        console.error(err)
+        logger.error(err)
         reject(err)
       })
     })
