@@ -11,8 +11,10 @@ class Database {
   private isInitialized = false
   
   constructor(options = {}) {
+    logger.verbose('initializing ...')
     this.initialize(options).then(() => {
       this.isInitialized = true
+      logger.verbose('initialize done...')
     })
   }
   
@@ -22,7 +24,7 @@ class Database {
       FileCache,
       Translation
     ]
-    logger.log('databaseType is ', databaseType)
+    logger.verbose('databaseType is ' + databaseType)
   
     switch (databaseType) {
       case 'mysql':
@@ -39,15 +41,20 @@ class Database {
       default:
         const sqlitePath = Path.resolve(PATH.DATA, 'services.sqlite')
         logger.log('Services sqlite Path is: ', sqlitePath)
-        this.connection = await createConnection({
-          type: "sqlite",
-          entities,
-          database: sqlitePath
-        })
+        try {
+          this.connection = await createConnection({
+            type: "sqlite",
+            entities,
+            database: sqlitePath
+          })
+        } catch (e) {
+          logger.error('Fatal error ', e)
+          throw e
+        }
     }
-    logger.log('Wait for connection synchronize ...')
+    logger.verbose('Wait for connection synchronize ...')
     await this.connection.synchronize()
-    logger.log('Connection synchronize completed...')
+    logger.verbose('Connection synchronize completed...')
   }
   
   async waitUntilInitialized() {
@@ -55,6 +62,7 @@ class Database {
     let waitTime = 0
     
     while (!this.isInitialized && maxWaitTimes > waitTime++) {
+      logger.log('Pending for database initialized ... ' + waitTime )
       await new Promise(resolve => setTimeout(resolve, 250))
     }
     
@@ -65,6 +73,8 @@ class Database {
   }
   
   async createFileCache(hash, url) {
+    logger.verbose('database called: createFileCache')
+  
     await this.waitUntilInitialized()
     const newItem = new FileCache()
     // Noel name
@@ -80,6 +90,8 @@ class Database {
   }
   
   async updateFileCache(hash, url) {
+    logger.verbose('database called: updateFileCache')
+  
     await this.waitUntilInitialized()
     const repository = await this.connection.getRepository(FileCache)
     const existedItem = await repository.findOne({hash})
@@ -99,11 +111,15 @@ class Database {
   }
   
   async removeFileCache(hash: string) {
+    logger.verbose('database called: removeFileCache')
+  
     await this.waitUntilInitialized()
     await this.connection.getRepository(FileCache).delete({hash})
   }
   
   async findFileCache(hash: string) {
+    logger.verbose('database called: findFileCache')
+  
     await this.waitUntilInitialized()
     const item = await this.connection.getRepository(FileCache).findOne({hash})
     if (item) {
@@ -116,12 +132,16 @@ class Database {
   }
   
   async findTranslationCache(hash: string): Promise<string|void> {
+    logger.verbose('database called: findTranslationCache')
+  
     await this.waitUntilInitialized()
     const item = await this.connection.getRepository(Translation).findOne({hash})
     if (item) return item.text
   }
   
   async createTransltionCache(hash, text) {
+    logger.verbose('database called: createTransltionCache')
+  
     await this.waitUntilInitialized()
     const item = new Translation()
     item.hash = hash

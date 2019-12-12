@@ -4,15 +4,18 @@ import { PATH } from "platforms/constants"
 import * as Path from "path"
 import Logger from 'platforms/logger'
 
-const logger = new Logger('database')
+const logger = new Logger('electron-database')
 
 class DataBase {
   private connection: Connection = null
   private isInitialized = false
   
   constructor() {
+    logger.verbose('initializing ...')
     this.initialize().then(() => {
       this.isInitialized = true
+      logger.verbose('initialize done...')
+  
     })
   }
   
@@ -36,24 +39,32 @@ class DataBase {
       default:
         const sqlitePath = Path.resolve(PATH.DATA, './electron.sqlite')
         logger.log('Sqlite Path is: ', sqlitePath)
-        this.connection = await createConnection({
-          type: "sqlite",
-          entities,
-          database: sqlitePath
-        })
+        try {
+          this.connection = await createConnection({
+            type: "sqlite",
+            entities,
+            database: sqlitePath,
+            logger: 'file'
+          })
+        } catch (e) {
+          logger.error('Fatal error ', e)
+          throw e
+        }
+        logger.log('Sqlite Connection created. ')
     }
     
+    logger.verbose('Wait for connection synchronize ...')
     await this.connection.synchronize()
-    
+    logger.verbose('Connection synchronize completed...')
   }
   
   async waitUntilInitialized() {
-    let maxWaitTimes = 20
+    let maxWaitTimes = 200
     let waitTime = 0
     
     while (!this.isInitialized && maxWaitTimes > waitTime++) {
-      logger.log('Pending for database initialized')
-      await new Promise(resolve => setTimeout(resolve, 250))
+      logger.log('Pending for database initialized ... ' + waitTime )
+      await new Promise(resolve => setTimeout(resolve, 500))
     }
     
     if (!this.isInitialized) {
@@ -73,6 +84,7 @@ class DataBase {
   }
   
   async addStorageItem(prefix: string, key: string, value: string) {
+    logger.verbose('database called: addStorageItem')
     await this.waitUntilInitialized()
     const item = new Storage()
     item.prefix = prefix
@@ -83,22 +95,27 @@ class DataBase {
   }
   
   async removeStorageItem(prefix: string, key: string): Promise<string|void> {
+    logger.verbose('database called: removeStorageItem ...')
     await this.waitUntilInitialized()
     await this.connection.getRepository(Storage).delete({prefix, key})
   }
   
   async removeStorage(prefix: string): Promise<string|void> {
+    logger.verbose('database called: removeStorage ...')
     await this.waitUntilInitialized()
     await this.connection.getRepository(Storage).delete({prefix})
   }
   
   async keysOfStorage(prefix: string): Promise<string[]> {
+    logger.verbose('database called: keysOfStorage ...')
     await this.waitUntilInitialized()
     const items = await this.connection.getRepository(Storage).find({prefix})
     return items.map(item => item.key)
   }
   
   async sizeOfStorage(prefix: string): Promise<number> {
+    logger.verbose('database called: sizeOfStorage ...')
+  
     await this.waitUntilInitialized()
     const items = await this.connection.getRepository(Storage).find({prefix})
     return items.reduce((sum, item) => sum + item.value.length , 0)
@@ -106,6 +123,8 @@ class DataBase {
   
   
   async updateStoreItem(id: string, value: string):Promise<any> {
+    logger.verbose('database called: updateStoreItem ...')
+  
     await this.waitUntilInitialized()
     const repository = this.connection.getRepository(Storage)
     const item = await repository.findOne({id})

@@ -17,7 +17,7 @@ export default function createWindow(name, windowOptions: BrowserWindowConstruct
   
   window.webContents.on('new-window', async (event, navigationUrl) => event.preventDefault())
   if (process.env.NODE_ENV === 'production') {
-    window.webContents.openDevTools()
+    // window.webContents.openDevTools()
     window.loadURL(url.format({
       pathname: path.resolve(__dirname, `../app/${name}/index.html`),
       protocol: 'file:',

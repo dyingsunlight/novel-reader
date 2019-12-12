@@ -29,8 +29,8 @@ import { npm, commandPromise } from '../utils/command'
   console.log('Start Electron Packager ... ')
   await Packager({
     dir: baseBuildingDir,
-    platform: 'win32',
-    asar: true,
+    platform: 'darwin',
+    asar: false,
     osxSign: false,
     out: path.resolve(projectRoot, `dist/electron/${new Date().getTime()}`)
   })

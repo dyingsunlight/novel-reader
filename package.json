@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "postinstall": "electron-rebuild sqlite3",
+    "test-build": "electron .build/electron/platforms/electron/main.js",
     "dev:web-app": "ts-node ./scripts/web/dev-app.ts",
     "dev:web-server": "ts-node ./scripts/web/dev.ts --auto-reload",
     "build:web-distribution": "ts-node ./scripts/web/build.ts",
