@@ -3,7 +3,7 @@ import request from "./library/request"
 
 export default class Resolver implements Services.Resolver {
   async getMeta(url: string) {
-    const res = await request.get('/novel/meta', {
+    const res = await request.get('/api/novel/meta', {
       params: {
         url
       }
@@ -17,7 +17,7 @@ export default class Resolver implements Services.Resolver {
   }
   
   async getChapter(url: string) {
-    const res = await request.get('/novel/chapter', {
+    const res = await request.get('/api/novel/chapter', {
       params: {
         url
       }

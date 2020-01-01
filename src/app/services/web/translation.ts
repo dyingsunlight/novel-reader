@@ -4,7 +4,7 @@ import {Services} from "app/app-model"
 import { ScheduledTranslator } from "../common"
 
 async function translate(text: string, { engine = 'youdao', marker = ''} = {}) {
-  const res = await request.post('/text/translation', {
+  const res = await request.post('/api/text/translation', {
     engine,
     marker,
     // Translation Params
@@ -33,7 +33,7 @@ export class Translation implements Services.Translation {
     return await this.scheduleTranslator.translate(text, engine)
   }
   async audio(text: string): Promise<string> {
-    const res = await request.post('/text/audio', {
+    const res = await request.post('/api/text/audio', {
       engine: 'baidu',
       params: {
         text,
@@ -48,6 +48,6 @@ export class Translation implements Services.Translation {
     
     const url = res.data
     
-    return request.url(`/text/audio?url=${encodeURIComponent(url)}`)
+    return request.url(`/api/text/audio?url=${encodeURIComponent(url)}`)
   }
 }

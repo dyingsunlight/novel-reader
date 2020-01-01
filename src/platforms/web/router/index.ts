@@ -1,105 +1,35 @@
 import {Application, Request, Response} from 'express'
-import * as translator from 'translation.js'
-import TranslationController from '../controllers/translation'
-import SiteResolverController from '../controllers/site-resolver'
-import Axios from 'axios'
+import ResolverRouter from './resolver'
+import TranslationRouter from './translation'
+import UserRouter from './user'
+import * as AuthenticationRouter from './authentication'
 
 export default {
   setup(app: Application) {
-    app.post('/text/translation', async (req, res, next) => {
-
-      const body = req.body || {}
-      const engine = (body.engine || '').toLowerCase()
-      const marker = (body.marker || '').toLowerCase()
-      const params = body.params
-
-      if (!engine || !params || !translator[engine] || typeof params !== 'object') {
+    app.post('/api/text/translation', AuthenticationRouter.verify(), TranslationRouter.translate)
+    app.get('/api/text/audio', AuthenticationRouter.verify(), TranslationRouter.audioStream)
+    app.post('/api/text/audio', AuthenticationRouter.verify(), TranslationRouter.audioURL)
+    
+    app.get('/api/novel/meta', AuthenticationRouter.verify(), ResolverRouter.meta)
+    app.get('/api/novel/chapter', AuthenticationRouter.verify(), ResolverRouter.chapter)
+    app.put('/api/user/register', (req, res, next) => {
+      if (process.env['DISABLED_REGISTER']) {
+        res.statusMessage = 'Register has been disabled'
         res.sendStatus(403)
         return
+      } else {
+        next()
       }
-      
-      let data
-      try {
-         data = await TranslationController.translate(params, { engine, marker})
-      } catch (e) {
-        console.error(e)
-        res.sendStatus(500)
-      }
-      res.send(data)
-    })
-    
-    app.get('/text/audio', async (req, res, next) => {
-      const audioURL = req.query['url']
-      if (!audioURL) {
-        res.sendStatus(400)
-        return
-      }
-    
-      const audioPipe = await Axios.get(audioURL, {
-        responseType:'stream'
-      })
-      
-      res.setHeader("content-type", audioPipe.headers['content-type']);
-    
-      audioPipe.data.pipe(res)
-    })
+    }, UserRouter.register)
+    app.post('/api/user/login', UserRouter.login)
+    app.get('/api/user/profile', AuthenticationRouter.verify(), UserRouter.profile)
+    app.post('/api/user/logout', UserRouter.logout)
   
-    app.post('/text/audio', async (req, res, next) => {
-    
-      const body = req.body || {}
-      const engine = (body.engine || '').toLowerCase()
-      const params = body.params
-    
-      if (!engine || !params || !translator[engine] || typeof params !== 'object') {
-        res.sendStatus(403)
-        return
+    // Ensure Reader page must login to access it
+    app.get('/reader/*', AuthenticationRouter.verify({
+      onFailed: (res, req) => {
+        res.redirect('/account/index.html')
       }
-    
-      let audioURL
-      try {
-        audioURL = await translator[engine].audio(params)
-      } catch (e) {
-        console.error(e)
-        res.sendStatus(500)
-      }
-      
-      res.send(audioURL)
-
-    })
-  
-    app.get('/novel/meta', async (req: Request, res: Response, next) => {
-      const url = req.query['url']
-      if (!url) {
-        res.sendStatus(400)
-        return
-      }
-      
-      try {
-        const data = await SiteResolverController.getMeta(url)
-        res.contentType('application/json')
-        res.send(data)
-      } catch (e) {
-        console.error(e)
-        res.sendStatus(500)
-      }
-    })
-    
-    app.get('/novel/chapter', async (req: Request, res: Response, next) => {
-      const url = req.query['url']
-      if (!url) {
-        res.sendStatus(400)
-        return
-      }
-    
-      try {
-        const data = await SiteResolverController.getChapter(url)
-        res.contentType('text/plain')
-        res.send(data)
-      } catch (e) {
-        console.error(e)
-        res.sendStatus(500)
-      }
-    
-    })
+    }), (req, res, next) => next())
   }
 }
